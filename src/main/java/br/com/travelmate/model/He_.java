@@ -1,0 +1,78 @@
+package br.com.travelmate.model;
+
+import java.util.Date;
+import javax.annotation.Generated;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.StaticMetamodel;
+
+@Generated(value="Dali", date="2018-06-25T23:00:35.094-0300")
+@StaticMetamodel(He.class)
+public class He_ {
+	public static volatile SingularAttribute<He, Integer> idhe;
+	public static volatile SingularAttribute<He, String> primeiralingua;
+	public static volatile SingularAttribute<He, String> segundalingua;
+	public static volatile SingularAttribute<He, Integer> numerosemanas;
+	public static volatile SingularAttribute<He, Date> datainicio;
+	public static volatile SingularAttribute<He, Date> datatermino;
+	public static volatile SingularAttribute<He, String> curso1;
+	public static volatile SingularAttribute<He, String> curso2;
+	public static volatile SingularAttribute<He, String> curso3;
+	public static volatile SingularAttribute<He, String> codigo1;
+	public static volatile SingularAttribute<He, String> codigo2;
+	public static volatile SingularAttribute<He, String> codigo3;
+	public static volatile SingularAttribute<He, String> paisprograma;
+	public static volatile SingularAttribute<He, String> mesano1;
+	public static volatile SingularAttribute<He, String> mesano2;
+	public static volatile SingularAttribute<He, String> mesano3;
+	public static volatile SingularAttribute<He, String> possuiexame;
+	public static volatile SingularAttribute<He, String> nomeexame;
+	public static volatile SingularAttribute<He, String> notaexame;
+	public static volatile SingularAttribute<He, Date> dataexame;
+	public static volatile SingularAttribute<He, String> cursarparhaway;
+	public static volatile SingularAttribute<He, String> nomeinstituicaoestudou;
+	public static volatile SingularAttribute<He, String> maiorgrauformacao;
+	public static volatile SingularAttribute<He, String> bandeiracartao;
+	public static volatile SingularAttribute<He, String> numerocartao;
+	public static volatile SingularAttribute<He, String> datavlidade;
+	public static volatile SingularAttribute<He, String> nometitular;
+	public static volatile SingularAttribute<He, String> codigoseguranca;
+	public static volatile SingularAttribute<He, Float> valorinscricao;
+	public static volatile SingularAttribute<He, Float> assessoriatm;
+	public static volatile SingularAttribute<He, Vendas> vendas;
+	public static volatile SingularAttribute<He, Boolean> aprovado;
+	public static volatile SingularAttribute<He, Boolean> fichafinal;
+	public static volatile SingularAttribute<He, String> instituicaoensinomedio;
+	public static volatile SingularAttribute<He, String> anoconclusao;
+	public static volatile SingularAttribute<He, String> localconclusaoensinomedo;
+	public static volatile SingularAttribute<He, Boolean> desistencia;
+	public static volatile SingularAttribute<He, String> instituicao1;
+	public static volatile SingularAttribute<He, String> instituicao2;
+	public static volatile SingularAttribute<He, String> instituicao3;
+	public static volatile SingularAttribute<He, String> tipoAcomodacao;
+	public static volatile SingularAttribute<He, Integer> numeroSemanasAcomodacao;
+	public static volatile SingularAttribute<He, String> tipoQuarto;
+	public static volatile SingularAttribute<He, String> refeicoes;
+	public static volatile SingularAttribute<He, String> adicionais;
+	public static volatile SingularAttribute<He, Date> dataChegada;
+	public static volatile SingularAttribute<He, Date> dataSaida;
+	public static volatile SingularAttribute<He, String> familiacomCrianca;
+	public static volatile SingularAttribute<He, String> familiacomAnimais;
+	public static volatile SingularAttribute<He, String> fumante;
+	public static volatile SingularAttribute<He, String> vegetariano;
+	public static volatile SingularAttribute<He, String> hobbies;
+	public static volatile SingularAttribute<He, String> possuiAlergia;
+	public static volatile SingularAttribute<He, String> quaisAlergias;
+	public static volatile SingularAttribute<He, String> solicitacoesEspeciais;
+	public static volatile SingularAttribute<He, String> banheiroprivativo;
+	public static volatile SingularAttribute<He, String> nomeContatoEmergencia;
+	public static volatile SingularAttribute<He, String> emailContatoEmergencia;
+	public static volatile SingularAttribute<He, String> foneContatoEmergencia;
+	public static volatile SingularAttribute<He, String> relacaoContatoEmergencia;
+	public static volatile SingularAttribute<He, String> tipoFicha;
+	public static volatile SingularAttribute<He, Integer> questionario;
+	public static volatile SingularAttribute<He, Float> notalinguagem;
+	public static volatile SingularAttribute<He, Float> notaciencianatureza;
+	public static volatile SingularAttribute<He, Float> notacienciahumanas;
+	public static volatile SingularAttribute<He, Float> notamatematica;
+	public static volatile SingularAttribute<He, Float> notaredacao;
+}

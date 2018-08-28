@@ -1,0 +1,1044 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/pages/templates/default.xhtml">
+	<ui:define name="corpo">
+		<h:form id="idfrmconsultatraineer" style="font-size:11px;">
+			<div id="centro">
+				<p:growl id="growl" showDetail="true" sticky="false" life="#{aplicacaoMB.parametrosprodutos.tempomensagens}"/>
+				<br></br>
+				<p:accordionPanel class="painel" activeIndex="-1">
+					<p:tab titleStyle="color:#000;font-size:11px;background:#c7d95f;"
+						title="Pesquisar">
+						<h:panelGrid columns="2" columnClasses="tamanho7, tamanhoavisos" style="width:90%;margin-left:4%;">
+							<p:outputLabel value="ID venda" for="idVenda" />
+							<p:outputLabel value="Nome do Cliente" for="cliente" />
+							 
+							<p:inputText id="idVenda" value="#{traineeMB.idVenda}"
+								style="width:87px;" />  
+							<p:inputText id="cliente" value="#{traineeMB.nome}"
+								style="width:260px;" />
+						</h:panelGrid>
+						<br></br>
+						<h:panelGrid columns="6" columnClasses="tamanho7, tamanho1,tamanho8,tamanho1,tamanho7,tamanho1" style="width:90%;margin-left:4%;">
+							<p:outputLabel value="Periodo" for="dataIni" />
+							<p:outputLabel/>
+							<p:outputLabel value="Unidade" for="unidade" />
+							<p:outputLabel value="Situação" for="situacao"/>
+							<p:outputLabel/><p:outputLabel/>
+						 
+						 
+							<p:calendar id="dataIni" value="#{traineeMB.dataInicio}"
+								size="12"  locale="pt"
+								pattern="dd/MM/yyyy" mask="true" maxlength="15">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+								<p:ajax event="blur" />
+							</p:calendar>
+							<p:calendar id="dataFinal" value="#{traineeMB.dataTermino}"
+								size="12"  locale="pt"
+								pattern="dd/MM/yyyy" mask="true" maxlength="15">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+								<p:ajax event="blur" />
+							</p:calendar>
+							<p:selectOneMenu id="unidade" value="#{traineeMB.unidadenegocio}"
+								style="width:200px;" filter="true" filterMatchMode="startsWith" panelStyle="width:180px"
+								converter="UnidadeNegocioConverter"
+								disabled="#{traineeMB.habilitarUnidade}">
+								<f:selectItem itemLabel="Selecione" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idunidade"
+									value="#{traineeMB.listaUnidadeNegocio}" var="sUnidade"
+									itemLabel="#{sUnidade.nomerelatorio}" itemValue="#{sUnidade}" />
+								<f:attribute name="listaUnidade"
+									value="#{traineeMB.listaUnidadeNegocio}" />
+							</p:selectOneMenu>
+							<p:selectOneMenu id="situacao" value="#{traineeMB.situacao}"
+								style="width:95px;">
+								<f:selectItem itemLabel="TODAS" itemValue="TODAS" />
+								<f:selectItem itemLabel="ANDAMENTO" itemValue="ANDAMENTO" />
+								<f:selectItem itemLabel="CANCELADA" itemValue="CANCELADA" />
+								<f:selectItem itemLabel="PROCESSO" itemValue="PROCESSO" />
+								<f:selectItem itemLabel="FINALIZADA" itemValue="FINALIZADA" />
+								<p:ajax event="change" />
+							</p:selectOneMenu>
+							<p:commandButton value="Pesquisar"  
+								icon=" ui-icon-search "
+								update="idfrmconsultatraineer:acordionPainel"
+								action="#{traineeMB.pesquisar()}" />
+							<p:commandButton value="Limpar" icon="ui-icon-arrowrefresh-1-w" 
+								update="idfrmconsultatraineer:acordionPainel, situacao, unidade, dataFinal, dataIni, cliente"
+								action="#{traineeMB.limparPesquisa()}" />
+						</h:panelGrid>
+						<br></br>
+
+					</p:tab>
+				</p:accordionPanel>
+
+				<legend id="iUsu2">
+					<b>Consulta de Trainee </b>
+				</legend>
+
+				<p:commandButton value="Nova Ficha" icon="ui-icon-plus"
+					class="botaoConsulta" style="font-size:12px;margin-left:80%"
+					onclick="PF('novaficha').show();" />
+				<p:dialog message="CRM" showEffect="fade" hideEffect="fade" header="ATENÇÃO"
+						width="36%" icon="ui-icon-alert" widgetVar="novaficha"
+						style="font-size:14px">
+						<h:panelGroup style="margin-left:2%;">
+							<h:outputText value="Por favor emitir a venda através da ferramenta CRM. Obrigado" style="font-size:16px;" />
+						</h:panelGroup>
+						<br/><br/>
+						<p:commandButton action="#{traineeMB.notificarEfetuarFichaCrm()}" value="Ir para CRM"
+							oncomplete="PF('novaficha').hide();" styleClass="ui-confirmdialog-yes"
+							
+							style="margin-left:40%;font-size:12px"/>
+						<br/>
+					</p:dialog>
+				<br></br> <br></br>
+			
+				<p:tabView id="acordionPainel" class="consultaCurso">   
+					<p:tab title="Processo (#{traineeMB.nFichasProcesso})"
+						titleStyle="font-size:11px;">
+						<p:dataTable id="tabelaConsultaProcesso" var="traineeProcesso"
+							value="#{traineeMB.listaVendasProcesso}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" style="margin-bottom:20px">
+		
+							<p:column style="width:40px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeProcesso)}" title="#{traineeProcesso.tituloFicha}"
+									onclick="PF('liberarficha').show();"  rendered="#{traineeMB.imagemSituacaoUsuario(traineeProcesso)}">  
+									<img src="#{traineeProcesso.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeProcesso.habilitarImagemFranquia}" title="#{traineeProcesso.tituloFicha}">
+									<img src="#{traineeProcesso.imagem}" width="60%" />
+								</p:commandLink> 
+							</p:column>
+							<p:column headerText="ID Venda" sortBy="#{traineeProcesso.vendas.idvendas}" style="width:90px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeProcesso)}"
+									onclick="PF('cd').show();"  rendered="#{traineeMB.linkIdVenda}">
+									<h:outputText value="#{traineeProcesso.vendas.idvendas}" style="#{traineeMB.cor(traineeProcesso)}"/>
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeMB.linkIdVendaFranquias}">
+									<h:outputText value="#{traineeProcesso.vendas.idvendas}" style="#{traineeMB.cor(traineeProcesso)}"/>
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Cliente" sortBy="#{traineeProcesso.vendas.cliente.nome}" style="width:150px; ">
+								<h:outputText value="#{traineeProcesso.vendas.cliente.nome}" style="#{traineeMB.corNome(traineeProcesso)}"/>
+							</p:column>
+							<p:column headerText="Data Venda" sortBy="#{traineeProcesso.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{traineeProcesso.vendas.dataVenda}" style="#{traineeMB.cor(traineeProcesso)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;" sortBy="#{traineeProcesso.vendas.unidadenegocio.nomerelatorio}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{traineeProcesso.vendas.unidadenegocio.nomerelatorio}" style="#{traineeMB.cor(traineeProcesso)}"/>
+							</p:column>
+							<p:column headerText="Consultor" sortBy="#{traineeProcesso.vendas.usuario.nome}" style="width:130px;"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeProcesso.vendas.usuario.nome}" style="#{traineeMB.cor(traineeProcesso)}"/>
+							</p:column>
+							<p:column headerText="Tipo" style="width:80px;" sortBy="#{traineeProcesso.tipotrainee}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeProcesso.tipotrainee}" style="#{traineeMB.cor(traineeProcesso)}"/>
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{traineeMB.editar(traineeProcesso)}" title="Editar"
+									style="text-decoration: none" disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaProcesso" />
+								</p:commandLink>
+							</p:column>        
+							<p:column headerText="Imprimir" rendered="#{traineeMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton action="#{traineeMB.fichaTrainee(traineeProcesso)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">  
+								</h:commandButton>     
+							</p:column> 
+							
+							
+							
+							<p:column headerText="Opções" style="width:75px;text-align:center;">  
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade" style="background:#F0F0F0;width:850px; border:none;">
+									<p:outputLabel
+										value="#{traineeProcesso.vendas.idvendas} - #{traineeProcesso.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid style="width:100%;border-color:transparent;border:none;" columns="9">
+										
+											<p:commandLink action="#{traineeMB.boletos(traineeProcesso)}" disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}"
+												title="IMPRIMIR OS BOLETOS" 
+												ajax="false" target="_blank" >
+												<img src="../../resources/img/boletoFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="BOLETOS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>  
+												
+											<p:commandLink style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+												update=":idfrmconsultatraineer:dialog_obsTM"
+												oncomplete="PF('obstm').show()"> 
+												<p:ajax listener="#{traineeMB.obsTM(traineeProcesso)}"/>
+												<img src="#{traineeMB.retornarIconeObsTM(traineeProcesso)}" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+													<p:outputLabel value="OBS" style="font-size:11px;"/>
+													<p:outputLabel value="TM"/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+											<p:commandLink
+												action="#{traineeMB.contrato(traineeProcesso)}"
+												title="IMPRIMIR O CONTRATO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}">
+												<img src="../../resources/img/imprimiContrato.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CONTRATO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioTermoVisto(traineeProcesso)}"
+												title="IMPRIMIR O TERMO DE VISTO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}">
+												<img src="../../resources/img/imprimiVisto.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="TERMO" style="font-size:11px;"/>
+														<p:outputLabel value="VISTO"/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioRecibo(traineeProcesso)}"
+												title="IMPRIMIR O RECIBO"
+												ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}">
+												<img src="../../resources/img/imprimiRecibo.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="RECIBO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+												<p:commandLink action="#{traineeMB.documentacao(traineeProcesso)}"
+													title="DOCUMENTOS" disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}"  update=":idfrmconsultatraineer:growl">
+													<img src="../../resources/img/arquivosUpload.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="DOCS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												    
+												<p:commandLink action="#{traineeMB.informacoes(traineeProcesso)}"
+													title="INFORMAÇÕES DA VENDA"
+													disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}">
+													<img src="../../resources/img/informacao.png" width="36" />
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="INFO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+												<p:commandLink
+														action="#{traineeMB.visualizarContasReceber(traineeProcesso)}"
+														title="VISUALIZAR CONTAS A RECEBER" 
+														
+														 >
+														<img src="../../resources/img/invoice.png" width="36" />
+														<h:panelGrid columns="1" style="text-align:center;"> 
+															<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+															<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+														</h:panelGrid>
+													</p:commandLink> 
+												
+												<p:commandLink action="#{traineeMB.cancelarVenda(traineeProcesso)}"  disabled="#{traineeMB.botoesHabilitados(traineeProcesso)}"
+													style="text-decoration: none" title="CANCELAR FICHA" update="tabelaConsultaProcesso">
+													<p:confirm header="Cancelamento"
+														message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+													<img src="../../resources/img/cancel.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CANCELAR" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+									</h:panelGrid>
+								</p:overlayPanel>
+							</p:column>  
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Financeiro (#{traineeMB.nFichasFinanceiro})"
+						titleStyle="font-size:11px;">    
+						<p:dataTable id="tabelaConsultaFinanceiro" var="traineeFinanceiro"
+							value="#{traineeMB.listaVendasFinanceiro}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" style="margin-bottom:20px">
+		
+							<p:column style="width:40px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeFinanceiro)}" title="#{traineeFinanceiro.tituloFicha}"
+									onclick="PF('liberarficha').show();"  rendered="#{traineeMB.imagemSituacaoUsuario(traineeFinanceiro)}">  
+									<img src="#{traineeFinanceiro.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeFinanceiro.habilitarImagemFranquia}" title="#{traineeFinanceiro.tituloFicha}">
+									<img src="#{traineeFinanceiro.imagem}" width="60%" />
+								</p:commandLink> 
+							</p:column>
+							<p:column headerText="ID Venda" sortBy="#{traineeFinanceiro.vendas.idvendas}" style="width:90px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeFinanceiro)}"
+									onclick="PF('cd').show();"  rendered="#{traineeMB.linkIdVenda}">
+									<h:outputText value="#{traineeFinanceiro.vendas.idvendas}" style="#{traineeMB.cor(traineeFinanceiro)}"/>
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeMB.linkIdVendaFranquias}">
+									<h:outputText value="#{traineeFinanceiro.vendas.idvendas}" style="#{traineeMB.cor(traineeFinanceiro)}"/>
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Cliente" sortBy="#{traineeFinanceiro.vendas.cliente.nome}" style="width:150px; ">
+								<h:outputText value="#{traineeFinanceiro.vendas.cliente.nome}" style="#{traineeMB.corNome(traineeFinanceiro)}"/>
+							</p:column>
+							<p:column headerText="Data Venda" sortBy="#{traineeFinanceiro.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{traineeFinanceiro.vendas.dataVenda}" style="#{traineeMB.cor(traineeFinanceiro)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;" sortBy="#{traineeFinanceiro.vendas.unidadenegocio.nomerelatorio}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{traineeFinanceiro.vendas.unidadenegocio.nomerelatorio}" style="#{traineeMB.cor(traineeFinanceiro)}"/>
+							</p:column>
+							<p:column headerText="Consultor" sortBy="#{traineeFinanceiro.vendas.usuario.nome}" style="width:130px;"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeFinanceiro.vendas.usuario.nome}" style="#{traineeMB.cor(traineeFinanceiro)}"/>
+							</p:column>
+							<p:column headerText="Tipo" style="width:80px;" sortBy="#{traineeFinanceiro.tipotrainee}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeFinanceiro.tipotrainee}" style="#{traineeMB.cor(traineeFinanceiro)}"/>
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{traineeMB.editar(traineeFinanceiro)}" title="Editar"
+									style="text-decoration: none" disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaFinanceiro" />
+								</p:commandLink>
+							</p:column>        
+							<p:column headerText="Imprimir" rendered="#{traineeMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton action="#{traineeMB.fichaTrainee(traineeFinanceiro)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">  
+								</h:commandButton>     
+							</p:column> 
+							
+							
+							
+							<p:column headerText="Opções" style="width:75px;text-align:center;">  
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade" style="background:#F0F0F0;width:850px; border:none;">
+									<p:outputLabel
+										value="#{traineeFinanceiro.vendas.idvendas} - #{traineeFinanceiro.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid style="width:100%;border-color:transparent;border:none;" columns="9">
+										
+											<p:commandLink action="#{traineeMB.boletos(traineeFinanceiro)}" disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}"
+												title="IMPRIMIR OS BOLETOS" 
+												ajax="false" target="_blank" >
+												<img src="../../resources/img/boletoFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="BOLETOS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>  
+												
+											<p:commandLink style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+												update=":idfrmconsultatraineer:dialog_obsTM"
+												oncomplete="PF('obstm').show()"> 
+												<p:ajax listener="#{traineeMB.obsTM(traineeFinanceiro)}"/>
+												<img src="#{traineeMB.retornarIconeObsTM(traineeFinanceiro)}" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+													<p:outputLabel value="OBS" style="font-size:11px;"/>
+													<p:outputLabel value="TM"/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+											<p:commandLink
+												action="#{traineeMB.contrato(traineeFinanceiro)}"
+												title="IMPRIMIR O CONTRATO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}">
+												<img src="../../resources/img/imprimiContrato.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CONTRATO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioTermoVisto(traineeFinanceiro)}"
+												title="IMPRIMIR O TERMO DE VISTO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}">
+												<img src="../../resources/img/imprimiVisto.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="TERMO" style="font-size:11px;"/>
+														<p:outputLabel value="VISTO"/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioRecibo(traineeFinanceiro)}"
+												title="IMPRIMIR O RECIBO"
+												ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}">
+												<img src="../../resources/img/imprimiRecibo.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="RECIBO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+												<p:commandLink action="#{traineeMB.documentacao(traineeFinanceiro)}"
+													title="DOCUMENTOS" disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}" update=":idfrmconsultatraineer:growl">
+													<img src="../../resources/img/arquivosUpload.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="DOCS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												    
+												<p:commandLink action="#{traineeMB.informacoes(traineeFinanceiro)}"
+													title="INFORMAÇÕES DA VENDA"
+													disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}">
+													<img src="../../resources/img/informacao.png" width="36" />
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="INFO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+												<p:commandLink
+														action="#{traineeMB.visualizarContasReceber(traineeFinanceiro)}"
+														title="VISUALIZAR CONTAS A RECEBER" 
+														
+														 >
+														<img src="../../resources/img/invoice.png" width="36" />
+														<h:panelGrid columns="1" style="text-align:center;"> 
+															<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+															<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+														</h:panelGrid>
+													</p:commandLink> 
+												
+												<p:commandLink action="#{traineeMB.cancelarVenda(traineeFinanceiro)}"  disabled="#{traineeMB.botoesHabilitados(traineeFinanceiro)}"
+													style="text-decoration: none" title="CANCELAR FICHA" update="tabelaConsultaFinanceiro">
+													<p:confirm header="Cancelamento"
+														message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+													<img src="../../resources/img/cancel.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CANCELAR" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+									</h:panelGrid>
+								</p:overlayPanel>
+							</p:column>  
+						</p:dataTable>
+					</p:tab>
+					
+					<p:tab title="Finalizado (#{traineeMB.nFichasFinalizadas})"
+						titleStyle="font-size:11px;">    
+						<p:dataTable id="tabelaConsultaFinalizado" var="traineeFinalizado"
+							value="#{traineeMB.listaVendasFinalizada}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" style="margin-bottom:20px">
+		
+							<p:column style="width:40px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeFinalizado)}" title="#{traineeFinalizado.tituloFicha}"
+									onclick="PF('liberarficha').show();"  rendered="#{traineeMB.imagemSituacaoUsuario(traineeFinalizado)}">  
+									<img src="#{traineeFinalizado.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeFinalizado.habilitarImagemFranquia}" title="#{traineeFinalizado.tituloFicha}">
+									<img src="#{traineeFinalizado.imagem}" width="60%" />
+								</p:commandLink> 
+							</p:column>
+							<p:column headerText="ID Venda" sortBy="#{traineeFinalizado.vendas.idvendas}" style="width:90px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeFinalizado)}"
+									onclick="PF('cd').show();"  rendered="#{traineeMB.linkIdVenda}">
+									<h:outputText value="#{traineeFinalizado.vendas.idvendas}" style="#{traineeMB.cor(traineeFinalizado)}"/>
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeMB.linkIdVendaFranquias}">
+									<h:outputText value="#{traineeFinalizado.vendas.idvendas}" style="#{traineeMB.cor(traineeFinalizado)}"/>
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Cliente" sortBy="#{traineeFinalizado.vendas.cliente.nome}" style="width:150px; ">
+								<h:outputText value="#{traineeFinalizado.vendas.cliente.nome}" style="#{traineeMB.corNome(traineeFinalizado)}"/>
+							</p:column>
+							<p:column headerText="Data Venda" sortBy="#{traineeFinalizado.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{traineeFinalizado.vendas.dataVenda}" style="#{traineeMB.cor(traineeFinalizado)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;" sortBy="#{traineeFinalizado.vendas.unidadenegocio.nomerelatorio}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{traineeFinalizado.vendas.unidadenegocio.nomerelatorio}" style="#{traineeMB.cor(traineeFinalizado)}"/>
+							</p:column>
+							<p:column headerText="Consultor" sortBy="#{traineeFinalizado.vendas.usuario.nome}" style="width:130px;"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeFinalizado.vendas.usuario.nome}" style="#{traineeMB.cor(traineeFinalizado)}"/>
+							</p:column>
+							<p:column headerText="Tipo" style="width:80px;" sortBy="#{traineeFinalizado.tipotrainee}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeFinalizado.tipotrainee}" style="#{traineeMB.cor(traineeFinalizado)}"/>
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{traineeMB.editar(traineeFinalizado)}" title="Editar"
+									style="text-decoration: none" disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaFinalizado" />
+								</p:commandLink>
+							</p:column>        
+							<p:column headerText="Imprimir" rendered="#{traineeMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton action="#{traineeMB.fichaTrainee(traineeFinalizado)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">  
+								</h:commandButton>     
+							</p:column> 
+							
+							
+							
+							<p:column headerText="Opções" style="width:75px;text-align:center;">  
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade" style="background:#F0F0F0;width:850px; border:none;">
+									<p:outputLabel
+										value="#{traineeFinalizado.vendas.idvendas} - #{traineeFinalizado.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid style="width:100%;border-color:transparent;border:none;" columns="9">
+										
+											<p:commandLink action="#{traineeMB.boletos(traineeFinalizado)}" disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}"
+												title="IMPRIMIR OS BOLETOS" 
+												ajax="false" target="_blank" >
+												<img src="../../resources/img/boletoFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="BOLETOS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>  
+												
+											<p:commandLink style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+												update=":idfrmconsultatraineer:dialog_obsTM"
+												oncomplete="PF('obstm').show()"> 
+												<p:ajax listener="#{traineeMB.obsTM(traineeFinalizado)}"/>
+												<img src="#{traineeMB.retornarIconeObsTM(traineeFinalizado)}" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+													<p:outputLabel value="OBS" style="font-size:11px;"/>
+													<p:outputLabel value="TM"/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+											<p:commandLink
+												action="#{traineeMB.contrato(traineeFinalizado)}"
+												title="IMPRIMIR O CONTRATO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}">
+												<img src="../../resources/img/imprimiContrato.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CONTRATO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioTermoVisto(traineeFinalizado)}"
+												title="IMPRIMIR O TERMO DE VISTO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}">
+												<img src="../../resources/img/imprimiVisto.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="TERMO" style="font-size:11px;"/>
+														<p:outputLabel value="VISTO"/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioRecibo(traineeFinalizado)}"
+												title="IMPRIMIR O RECIBO"
+												ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}">
+												<img src="../../resources/img/imprimiRecibo.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="RECIBO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+												<p:commandLink action="#{traineeMB.documentacao(traineeFinalizado)}"
+													title="DOCUMENTOS" disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}" update=":idfrmconsultatraineer:growl">
+													<img src="../../resources/img/arquivosUpload.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="DOCS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												    
+												<p:commandLink action="#{traineeMB.informacoes(traineeFinalizado)}"
+													title="INFORMAÇÕES DA VENDA"
+													disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}">
+													<img src="../../resources/img/informacao.png" width="36" />
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="INFO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+												<p:commandLink
+														action="#{traineeMB.visualizarContasReceber(traineeFinalizado)}"
+														title="VISUALIZAR CONTAS A RECEBER" 
+														
+														 >
+														<img src="../../resources/img/invoice.png" width="36" />
+														<h:panelGrid columns="1" style="text-align:center;"> 
+															<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+															<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+														</h:panelGrid>
+													</p:commandLink> 
+												
+												<p:commandLink action="#{traineeMB.cancelarVenda(traineeFinalizado)}"  disabled="#{traineeMB.botoesHabilitados(traineeFinalizado)}"
+													style="text-decoration: none" title="CANCELAR FICHA" update="tabelaConsultaFinalizado">
+													<p:confirm header="Cancelamento"
+														message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+													<img src="../../resources/img/cancel.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CANCELAR" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+									</h:panelGrid>
+								</p:overlayPanel>
+							</p:column>  
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Cancelado (#{traineeMB.nFichaCancelada})"
+						titleStyle="font-size:11px;">    
+						<p:dataTable id="tabelaConsultaCancelado" var="traineeCancelado"
+							value="#{traineeMB.listaVendasCancelada}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" style="margin-bottom:20px">
+		
+							<p:column style="width:40px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeCancelado)}" title="#{traineeCancelado.tituloFicha}"
+									onclick="PF('liberarficha').show();"  rendered="#{traineeMB.imagemSituacaoUsuario(traineeCancelado)}">  
+									<img src="#{traineeCancelado.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeCancelado.habilitarImagemFranquia}" title="#{traineeCancelado.tituloFicha}">
+									<img src="#{traineeCancelado.imagem}" width="60%" />
+								</p:commandLink> 
+							</p:column>
+							<p:column headerText="ID Venda" sortBy="#{traineeCancelado.vendas.idvendas}" style="width:90px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(traineeCancelado)}"
+									onclick="PF('cd').show();"  rendered="#{traineeMB.linkIdVenda}">
+									<h:outputText value="#{traineeCancelado.vendas.idvendas}" style="#{traineeMB.cor(traineeCancelado)}"/>
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeMB.linkIdVendaFranquias}">
+									<h:outputText value="#{traineeCancelado.vendas.idvendas}" style="#{traineeMB.cor(traineeCancelado)}"/>
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Cliente" sortBy="#{traineeCancelado.vendas.cliente.nome}" style="width:150px; ">
+								<h:outputText value="#{traineeCancelado.vendas.cliente.nome}" style="#{traineeMB.corNome(traineeCancelado)}"/>
+							</p:column>
+							<p:column headerText="Data Venda" sortBy="#{traineeCancelado.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{traineeCancelado.vendas.dataVenda}" style="#{traineeMB.cor(traineeCancelado)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;" sortBy="#{traineeCancelado.vendas.unidadenegocio.nomerelatorio}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{traineeCancelado.vendas.unidadenegocio.nomerelatorio}" style="#{traineeMB.cor(traineeCancelado)}"/>
+							</p:column>
+							<p:column headerText="Consultor" sortBy="#{traineeCancelado.vendas.usuario.nome}" style="width:130px;"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeCancelado.vendas.usuario.nome}" style="#{traineeMB.cor(traineeCancelado)}"/>
+							</p:column>
+							<p:column headerText="Tipo" style="width:80px;" sortBy="#{traineeCancelado.tipotrainee}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{traineeCancelado.tipotrainee}" style="#{traineeMB.cor(traineeCancelado)}"/>
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{traineeMB.editar(traineeCancelado)}" title="Editar"
+									style="text-decoration: none" disabled="#{traineeMB.botoesHabilitados(traineeCancelado)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaCancelado" />
+								</p:commandLink>
+							</p:column>        
+							<p:column headerText="Imprimir" rendered="#{traineeMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton action="#{traineeMB.gerarRelatorioFicha(traineeCancelado)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">  
+								</h:commandButton>     
+							</p:column> 
+							
+							
+							
+							<p:column headerText="Opções" style="width:75px;text-align:center;">  
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade" style="background:#F0F0F0;width:400px;">
+									<p:outputLabel
+										value="#{traineeCancelado.vendas.idvendas} - #{traineeCancelado.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid style="width:100%;border-color:transparent;border:none;" columns="9"> 
+											
+											<p:commandLink action="#{traineeMB.relatorioTermoQuitacao(traineeCancelado)}"
+													style="text-decoration: none" title="IMPRIMIR TERMO"
+													 >
+													<img src="../../resources/img/cancel.png" style="width: 36" />
+														<h:panelGrid columns="1" style="text-align:center;">
+															<p:outputLabel value="IMPRIMIR TERMO" style="font-size:10px;"/>
+															<p:outputLabel value="CANCELAMENTO" style="font-size:10px;"/>
+														</h:panelGrid>
+											</p:commandLink>   
+											
+											<p:commandLink action="#{traineeMB.documentacao(traineeCancelado)}"
+												update=":idfrmconsultatraineer:growl" title="DOCUMENTOS"
+												 >
+												<img src="../../resources/img/imprimirFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;">
+													<p:outputLabel value="DOCS" style="font-size:10px;"/>
+													<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink action="#{traineeMB.verificarIdCredito(traineeCancelado)}"
+												update=":idfrmconsultatraineer:growl" title="Verificar ID de Crédito"
+												 >
+												<img src="../../resources/img/numerosFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;">
+													<p:outputLabel value="VISUALIZAR" style="font-size:10px;"/>
+													<p:outputLabel value="ID CRÉDITO" style="font-size:10px;"/>
+												</h:panelGrid>
+											</p:commandLink>
+									</h:panelGrid>    
+								</p:overlayPanel>   
+							</p:column> 
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Todos (#{traineeMB.numFichas})"
+						titleStyle="font-size:11px;">
+						<p:dataTable id="tabelaConsultatrainee" var="trainee"
+							value="#{traineeMB.listaTrainee}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" style="margin-bottom:20px">
+		
+							<p:column style="width:40px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(trainee)}" title="#{trainee.tituloFicha}"
+									onclick="PF('liberarficha').show();"  rendered="#{traineeMB.imagemSituacaoUsuario(trainee)}">  
+									<img src="#{trainee.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink rendered="#{trainee.habilitarImagemFranquia}" title="#{trainee.tituloFicha}">
+									<img src="#{trainee.imagem}" width="60%" />
+								</p:commandLink> 
+							</p:column>
+							<p:column headerText="ID Venda" sortBy="#{trainee.vendas.idvendas}" style="width:90px;">
+								<p:commandLink action="#{traineeMB.dialogSalvarControle(trainee)}"
+									onclick="PF('cd').show();"  rendered="#{traineeMB.linkIdVenda}">
+									<h:outputText value="#{trainee.vendas.idvendas}" style="#{traineeMB.cor(trainee)}"/>
+								</p:commandLink>
+								<p:commandLink rendered="#{traineeMB.linkIdVendaFranquias}">
+									<h:outputText value="#{trainee.vendas.idvendas}" style="#{traineeMB.cor(trainee)}"/>
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Cliente" sortBy="#{trainee.vendas.cliente.nome}" style="width:150px; ">
+								<h:outputText value="#{trainee.vendas.cliente.nome}" style="#{traineeMB.corNome(trainee)}"/>
+							</p:column>
+							<p:column headerText="Data Venda" sortBy="#{trainee.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{trainee.vendas.dataVenda}" style="#{traineeMB.cor(trainee)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;" sortBy="#{trainee.vendas.unidadenegocio.nomerelatorio}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{trainee.vendas.unidadenegocio.nomerelatorio}" style="#{traineeMB.cor(trainee)}"/>
+							</p:column>
+							<p:column headerText="Consultor" sortBy="#{trainee.vendas.usuario.nome}" style="width:130px;"
+								styleClass="alinharCenter">
+								<h:outputText value="#{trainee.vendas.usuario.nome}" style="#{traineeMB.cor(trainee)}"/>
+							</p:column>
+							<p:column headerText="Tipo" style="width:80px;" sortBy="#{trainee.tipotrainee}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{trainee.tipotrainee}" style="#{traineeMB.cor(trainee)}"/>
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{traineeMB.editar(trainee)}" title="Editar"
+									style="text-decoration: none" disabled="#{traineeMB.botoesHabilitados(trainee)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultatrainee" />
+								</p:commandLink>
+							</p:column>        
+							<p:column headerText="Imprimir" rendered="#{traineeMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton action="#{traineeMB.fichaTrainee(trainee)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">  
+								</h:commandButton>     
+							</p:column> 
+							
+							
+							
+							<p:column headerText="Opções" style="width:75px;text-align:center;">  
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade" style="background:#F0F0F0;width:850px; border:none;">
+									<p:outputLabel
+										value="#{trainee.vendas.idvendas} - #{trainee.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid style="width:100%;border-color:transparent;border:none;" columns="9">
+										
+											<p:commandLink action="#{traineeMB.boletos(trainee)}" disabled="#{traineeMB.botoesHabilitados(trainee)}"
+												title="IMPRIMIR OS BOLETOS" 
+												ajax="false" target="_blank" >
+												<img src="../../resources/img/boletoFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="BOLETOS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>  
+												
+											<p:commandLink style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+												update=":idfrmconsultatraineer:dialog_obsTM"
+												oncomplete="PF('obstm').show()"> 
+												<p:ajax listener="#{traineeMB.obsTM(trainee)}"/>
+												<img src="#{traineeMB.retornarIconeObsTM(trainee)}" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+													<p:outputLabel value="OBS" style="font-size:11px;"/>
+													<p:outputLabel value="TM"/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+											<p:commandLink
+												action="#{traineeMB.contrato(trainee)}"
+												title="IMPRIMIR O CONTRATO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(trainee)}">
+												<img src="../../resources/img/imprimiContrato.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CONTRATO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioTermoVisto(trainee)}"
+												title="IMPRIMIR O TERMO DE VISTO"
+												 ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(trainee)}">
+												<img src="../../resources/img/imprimiVisto.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="TERMO" style="font-size:11px;"/>
+														<p:outputLabel value="VISTO"/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink
+												action="#{traineeMB.gerarRelatorioRecibo(trainee)}"
+												title="IMPRIMIR O RECIBO"
+												ajax="false"
+												target="_blank" disabled="#{traineeMB.botoesHabilitados(trainee)}">
+												<img src="../../resources/img/imprimiRecibo.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="RECIBO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											
+												<p:commandLink action="#{traineeMB.documentacao(trainee)}"
+													title="DOCUMENTOS" disabled="#{traineeMB.botoesHabilitados(trainee)}" update=":idfrmconsultatraineer:growl">
+													<img src="../../resources/img/arquivosUpload.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="DOCS" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												    
+												<p:commandLink action="#{traineeMB.informacoes(trainee)}"
+													title="INFORMAÇÕES DA VENDA"
+													disabled="#{traineeMB.botoesHabilitados(trainee)}">
+													<img src="../../resources/img/informacao.png" width="36" />
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="INFO" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+												<p:commandLink
+														action="#{traineeMB.visualizarContasReceber(trainee)}"
+														title="VISUALIZAR CONTAS A RECEBER" 
+														
+														 >
+														<img src="../../resources/img/invoice.png" width="36" />
+														<h:panelGrid columns="1" style="text-align:center;"> 
+															<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+															<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+														</h:panelGrid>
+													</p:commandLink> 
+												
+												<p:commandLink action="#{traineeMB.cancelarVenda(trainee)}"  disabled="#{traineeMB.botoesHabilitados(trainee)}"
+													style="text-decoration: none" title="CANCELAR FICHA" update="tabelaConsultatrainee">
+													<p:confirm header="Cancelamento"
+														message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+													<img src="../../resources/img/cancel.png" width="36"/>
+													<h:panelGrid columns="1" style="text-align:1px;">
+														<p:outputLabel value="CANCELAR" style="font-size:11px;"/>
+														<p:outputLabel value=" "/>
+												</h:panelGrid>
+												</p:commandLink>
+												
+									</h:panelGrid>
+								</p:overlayPanel>
+							</p:column>  
+						</p:dataTable>
+					</p:tab>
+				</p:tabView>
+				
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="background:#DDDDE1;">
+			    	<div align="center">
+				        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"  style="font-size:12px;"/>
+				        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"  style="font-size:12px;"/>
+			        </div>  
+			    </p:confirmDialog>  
+				
+				<br></br> <br></br>
+				<p:dialog showEffect="fade" hideEffect="fade" icon="ui-icon-alert"
+					widgetVar="cd" style="width:30%;font-size:14px">
+					<p:outputLabel value="Salvar controle desta ficha?" />
+					<br></br>
+					<br></br>
+					<p:commandButton value="Sim" action="#{traineeMB.salvarControle()}"
+						oncomplete="PF('cd').hide();" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" update="idfrmconsultatraineer:growl"
+						style="margin-left:13%;font-size:12px" />
+					<p:commandButton value="Não" oncomplete="PF('cd').hide();"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+						update="idfrmconsultatraineer:growl" style="font-size:12px" />
+				</p:dialog>
+				<p:dialog id="dialog_obsTM" header="Obs TM" widgetVar="obstm"
+					style="background:#d0e9c6;text-align: left">
+					<br></br>
+					<p:inputTextarea id="idObstm" value="#{traineeMB.obsTM}" rows="10"
+						cols="50" queryDelay="750" minQueryLength="4" readonly="true" />
+					<br></br>
+					<br></br>
+					<br></br>
+				</p:dialog>
+			</div>
+		</h:form>
+		<h:form id="cancelar">
+			<p:dialog id="dialog_cancelar" header="Cancelar" widgetVar="cancelar"
+				width="31%" style="background:#d0e9c6;text-align: left">
+				<p:outputLabel value="Motivo do Cancelamento" for="motivo"
+					style="font-size: 11px" />
+				<br></br>
+				<p:inputTextarea id="motivo" value="#{traineeMB.motivoCancelamento}"
+					cols="70" rows="3" />
+				<br></br>
+				<br></br>
+				<p:commandButton value="Salvar" icon="ui-icon-check"
+					action="#{traineeMB.cancelarVenda()}" class="espacocobranca23botao"
+					style="font-size:11px;margin-left:70%" update="@all"
+					onclick="cancelar.hide()" />
+			</p:dialog>
+			<p:ajaxStatus onstart="PF('statusDialog').show()"
+				onsuccess="PF('statusDialog').hide()" />
+
+			<p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+				closable="false" resizable="false" showHeader="false">
+				<p:commandLink action="#{usuarioLogadoMB.paginaPrincipal()}">
+					<img src="../../resources/img/carregandoNovo.gif" />
+				</p:commandLink>
+			</p:dialog>
+			<p:dialog showEffect="fade" hideEffect="fade" header="Confirmação"
+				icon="ui-icon-alert" widgetVar="liberarficha"
+				style="width:30%;font-size:14px">
+				<p:outputLabel
+					value="LIBERAR FICHA? Ficha será liberar para finalizar." />
+				<br></br>
+				<br></br>
+				<p:commandButton value="Sim" action="#{traineeMB.liberarFicha()}"
+					oncomplete="PF('liberarficha').hide();"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
+					update="idfrmconsultatraineer:growl"
+					style="margin-left:30%;font-size:12px" />
+				<p:commandButton value="Não" oncomplete="PF('liberarficha').hide();"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+					update="idfrmconsultatraineer:growl" style="font-size:12px" />
+			</p:dialog>
+				<p:dialog id="dialog_obsTM" header="Obs TM" widgetVar="obstm"
+					style="background:#d0e9c6;text-align: left">
+					<br></br>
+					<p:inputTextarea id="idObstm" value="#{traineeMB.obsTM}" rows="10" cols="50"
+						queryDelay="750" minQueryLength="4" readonly="true" />
+					<br></br>
+					<br></br>
+					<br></br>
+				</p:dialog>
+			<style>
+				.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td,
+					.ui-datatable tfoot th {
+					padding: 2px 2px;
+					overflow: hidden;
+					border-width: 0px;
+					border-style: solid;  
+				}
+				.ui-confirm-dialog-message {
+				    display: inline-block;
+				    margin-top: 1px;
+				    font-size: 17px !important;
+				}  
+				</style>
+			<br></br>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

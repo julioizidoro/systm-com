@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/pages/templates/default.xhtml">
+	<ui:define name="corpo">
+		<h:form id="consAcessoUnidade" style="font-size:11px;">
+			<div id="centro">
+				<p:growl id="growl" showDetail="true" sticky="false" life="#{aplicacaoMB.parametrosprodutos.tempomensagens}"/>
+				<br></br>
+				<p:accordionPanel class="painel" activeIndex="-1">
+					<p:tab titleStyle="color:#000;font-size:11px;background:#c7d95f;"
+						title="Pesquisar">
+						<div style="width: 74%;">
+							<h:panelGrid columns="3" style="width:100%;">
+								<p:outputLabel value="Unidade" for="unidade" />   
+								<p:outputLabel value="Consultor" for="consultor"/>
+								<p:outputLabel/>
+								
+								<p:selectOneMenu id="unidade"
+									value="#{acessoUnidadeMB.unidadenegocio}" style="width:200px;" disabled="#{acessoUnidadeMB.desabilitarCombo}"
+									converter="UnidadeNegocioConverter" filter="true" filterMatchMode="startsWith" panelStyle="width:180px">
+									<f:selectItem itemLabel="Todos" itemValue="0" />
+									<f:selectItems id="idunidade"  
+										value="#{acessoUnidadeMB.listaUnidade}" var="unidade"
+										itemLabel="#{unidade.nomerelatorio}" itemValue="#{unidade}" />
+									<f:attribute name="listaUnidade"
+										value="#{acessoUnidadeMB.listaUnidade}" />
+									<p:ajax event="change" listener="#{acessoUnidadeMB.gerarListaConsultor()}" update="consultor"/>
+								</p:selectOneMenu> 
+								
+								<p:selectOneMenu id="consultor" value="#{acessoUnidadeMB.usuario}"
+									style="width:200px;" filter="true" filterMatchMode="startsWith"
+									converter="UsuarioConverter"
+									disabled="#{acessoUnidadeMB.desabilitarCombo}">
+									<f:selectItem itemLabel="Selecione" itemValue="0"
+										noSelectionOption="true" />
+									<f:selectItems id="idconsultor"
+										value="#{acessoUnidadeMB.listaUsuario}" var="sUsuario"
+										itemLabel="#{sUsuario.nome}" itemValue="#{sUsuario}" />
+									<f:attribute name="listaUsuario"
+										value="#{acessoUnidadeMB.listaUsuario}" />
+									<p:ajax event="change"/>   
+								</p:selectOneMenu> 
+								<h:panelGroup>
+									<p:commandButton id="btnPesquisar" action="#{acessoUnidadeMB.gerarListaAcesso()}" value="Pesquisar"
+										style="margin-left:6%" icon=" ui-icon-search " update="consAcessoUnidade:tabelaAcesso, consultor, unidade" />
+									<p:commandButton id="btnLimpar" action="#{acessoUnidadeMB.limpar()}" value="Limpar"
+										style="margin-left:3%" icon="ui-icon-arrowrefresh-1-w"
+										update="consAcessoUnidade:tabelaAcesso, consultor, unidade" />
+								</h:panelGroup>
+							</h:panelGrid>
+						</div> 
+					</p:tab> 
+				</p:accordionPanel>
+ 
+				<legend id="iUsu2">
+					<b>Acessos da Unidade</b>
+				</legend>
+				 
+				<br></br>
+				<div style="width: 85%; margin-left: 8%;">
+					<p:dataTable id="tabelaAcesso" value="#{acessoUnidadeMB.listaAcesso}"  var="acesso"
+						scrollable="true" scrollHeight="300"
+						style="margin-bottom:20px;font-size:11px;"> 
+						<p:column headerText="Nome" style="width:125px;text-align:left;" sortBy="#{acesso.usuario.nome}">     
+							<h:outputText value="#{acesso.usuario.nome}" />
+						</p:column>   
+						<p:column headerText="Unidade" style="width:80px;text-align:left;" sortBy="#{acesso.usuario.unidadenegocio.nomerelatorio}">  
+							<h:outputText value="#{acesso.usuario.unidadenegocio.nomerelatorio}" />
+						</p:column>
+						<p:column headerText="CRM" style="width:50px;text-align: center;">  
+							<img src="#{acessoUnidadeMB.retornarAcesso(acesso.crm)}" style="width:20px;"/>
+						</p:column>
+						<p:column headerText="Comissão" style="width:50px;text-align: center;">  
+							<img src="#{acessoUnidadeMB.retornarAcesso(acesso.comissaoparceiros)}" style="width:20px;"/>
+						</p:column>
+						<p:column headerText="Dashboard" style="width:50px;text-align: center;">  
+							<img src="#{acessoUnidadeMB.retornarAcesso(acesso.dashboard)}" style="width:20px;"/>
+						</p:column>
+						<p:column headerText="Orçamento" style="width:50px;text-align: center;">  
+							<img src="#{acessoUnidadeMB.retornarAcesso(acesso.consultaorcamento)}" style="width:20px;"/>
+						</p:column> 
+						<p:column headerText="Emissões" style="width:50px;text-align: center;">  
+							<img src="#{acessoUnidadeMB.retornarAcesso(acesso.emissaoconsulta)}" style="width:20px;"/>
+						</p:column>
+						<p:column style="width:40px;text-align:center;">
+							<p:commandLink action="#{acessoUnidadeMB.editar(acesso)}" title="Editar"
+								style="text-decoration: none">
+								<img src="../../resources/img/editaricon.png" />
+							</p:commandLink>
+						</p:column>
+					</p:dataTable>
+				</div>
+				<br></br> <br></br>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

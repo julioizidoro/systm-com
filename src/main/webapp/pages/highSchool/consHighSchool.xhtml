@@ -1,0 +1,1137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/pages/templates/default.xhtml">
+	<ui:define name="corpo">
+		<h:form id="consultahighschool" style="font-size:11px;">
+			<div id="centro">
+				<p:growl id="growl" showDetail="true" sticky="false"
+					life="#{aplicacaoMB.parametrosprodutos.tempomensagens}" />
+				<br></br>
+				<p:accordionPanel class="painel" activeIndex="-1">
+					<p:tab titleStyle="color:#000;font-size:11px;background:#c7d95f;"
+						title="Pesquisar">
+						<h:panelGrid columns="5"
+							columnClasses="tamanho7, tamanho8, tamanho8, tamanho8, tamanho8"
+							style="width:96%;margin-left:4%;">
+							<p:outputLabel value="ID venda" for="idVenda" />
+							<p:outputLabel value="Nome do Cliente" for="cliente" />
+							<p:outputLabel value="Início do Programa" for="inicioPrograma" />
+							<p:outputLabel value="País" for="pais" />
+							<p:outputLabel value="Parceiro" for="fornecedor" />
+
+							<p:inputText id="idVenda" value="#{highSchoolMB.idVenda}"
+								style="width:90%;" />
+							<p:inputText id="cliente" value="#{highSchoolMB.nome}"
+								style="width:90%;" />
+							<p:inputText id="inicioPrograma"
+								value="#{highSchoolMB.dataInicioPrograma}" style="width:90%;" />
+							<p:selectOneMenu id="pais" value="#{highSchoolMB.pais}"
+								style="width:80%;" converter="PaisFornecedorConverter"
+								filter="true" filterMatchMode="startsWith"
+								panelStyle="width:180px">
+								<f:selectItem itemLabel="País" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idpais" value="#{highSchoolMB.listaPais}"
+									var="paises" itemLabel="#{paises.nome}" itemValue="#{paises}" />
+								<f:attribute name="listaPaisFornecedor"
+									value="#{highSchoolMB.listaPais}" />
+							</p:selectOneMenu>
+							<p:selectOneMenu id="fornecedor"
+								value="#{highSchoolMB.fornecedorcidade}" style="width:85%;"
+								filter="true" filterMatchMode="startsWith"
+								converter="FornecedorCidadeConverter" panelStyle="width:180px">
+								<f:selectItem itemLabel="Escola" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idfornecedor"
+									value="#{highSchoolMB.listaFornecedorProduto}" var="fornecedor"
+									itemLabel="#{fornecedor.fornecedor.nome}"
+									itemValue="#{fornecedor}" />
+								<f:attribute name="listaFornecedorCidade"
+									value="#{highSchoolMB.listaFornecedorProduto}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+						<br></br>
+						<h:panelGrid columns="6"
+							columnClasses="tamanho7, tamanho1,tamanho8,tamanho1,tamanho7,tamanho1"
+							style="width:90%;margin-left:4%;">
+							<p:outputLabel value="Periodo" for="dataIni" />
+							<p:outputLabel />
+							<p:outputLabel value="Unidade" for="unidade" />
+							<p:outputLabel value="Situação" for="situacao" />
+							<p:outputLabel />
+							<p:outputLabel />
+
+							<p:calendar id="dataIni" value="#{highSchoolMB.dataInicio}"
+								size="12" locale="pt" pattern="dd/MM/yyyy" mask="true"
+								maxlength="15">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+								<p:ajax event="blur" />
+							</p:calendar>
+							<p:calendar id="dataFinal" value="#{highSchoolMB.dataTermino}"
+								size="12" locale="pt" pattern="dd/MM/yyyy" mask="true"
+								maxlength="15">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+								<p:ajax event="blur" />
+							</p:calendar>
+							<p:selectOneMenu id="unidade"
+								value="#{highSchoolMB.unidadenegocio}" style="width:200px;"
+								converter="UnidadeNegocioConverter" filter="true"
+								filterMatchMode="startsWith" panelStyle="width:180px"
+								disabled="#{highSchoolMB.habilitarUnidade}">
+								<f:selectItem itemLabel="Selecione" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idunidade"
+									value="#{highSchoolMB.listaUnidadeNegocio}" var="sUnidade"
+									itemLabel="#{sUnidade.nomerelatorio}" itemValue="#{sUnidade}" />
+								<f:attribute name="listaUnidade"
+									value="#{highSchoolMB.listaUnidadeNegocio}" />
+							</p:selectOneMenu>
+							<p:selectOneMenu id="situacao" value="#{highSchoolMB.situacao}"
+								style="width:95px;">
+								<f:selectItem itemLabel="TODAS" itemValue="TODAS" />
+								<f:selectItem itemLabel="ANDAMENTO" itemValue="ANDAMENTO" />
+								<f:selectItem itemLabel="CANCELADA" itemValue="CANCELADA" />
+								<f:selectItem itemLabel="PROCESSO" itemValue="PROCESSO" />
+								<f:selectItem itemLabel="FINALIZADA" itemValue="FINALIZADA" />
+								<p:ajax event="change" />
+							</p:selectOneMenu>
+							<p:commandButton value="Pesquisar" icon=" ui-icon-search "
+								update="consultahighschool:acordionPainel"
+								action="#{highSchoolMB.pesquisar()}" />
+							<p:commandButton value="Limpar" icon="ui-icon-arrowrefresh-1-w"
+								update="consultahighschool:acordionPainel, situacao, unidade, dataFinal, dataIni, cliente ,idVenda"
+								action="#{highSchoolMB.limparPesquisa()}" />
+						</h:panelGrid>
+						<br></br>
+
+					</p:tab>   
+				</p:accordionPanel>
+
+				<legend id="iUsu2">
+					<b>Consulta de High School </b>
+				</legend>
+				<p:commandButton value="Nova Ficha" icon="ui-icon-plus" update=":consultahighschool:growl" oncomplete="PF('novaficha').show();"
+					 class="botaoConsulta"
+					style="font-size:12px;margin-left:80%" />
+				
+				<p:dialog message="CRM" showEffect="fade" hideEffect="fade" header="ATENÇÃO"
+						width="36%" icon="ui-icon-alert" widgetVar="novaficha"
+						style="font-size:14px">
+						<h:panelGroup style="margin-left:2%;">
+							<h:outputText value="Por favor emitir a venda através da ferramenta CRM. Obrigado" style="font-size:16px;" />
+						</h:panelGroup>
+						<br/><br/>
+						<p:commandButton action="#{highSchoolMB.notificarEfetuarFichaCrm()}" value="Ir para CRM"
+							oncomplete="PF('novaficha').hide();" styleClass="ui-confirmdialog-yes"
+							
+							style="margin-left:40%;font-size:12px"/>
+						<br/>
+					</p:dialog>
+				<br></br> <br></br>
+				<p:tabView id="acordionPainel" class="consultaCurso" >  
+					<p:tab title="Processo (#{highSchoolMB.nFichasProcesso})" titleStyle="font-size:11px;">
+						<p:dataTable id="tabelaConsultaProcesso" var="highSchoolProcesso"
+							value="#{highSchoolMB.listaVendasProcesso}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" rows="15"
+							style="margin-bottom:20px">
+							<p:column style="text-align:center;width:40px;">
+								<p:commandLink title="PROCESSO (FICHA NÃO ENVIADA PARA GERÊNCIA)"
+									action="#{highSchoolMB.buscarHighSchool(highSchoolProcesso)}"
+									onclick="PF('liberarficha').show();"
+									rendered="#{highSchoolMB.imagemSituacaoUsuario(highSchoolProcesso)}">
+									<img src="#{highSchoolProcesso.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink title="PROCESSO (FICHA NÃO ENVIADA PARA GERÊNCIA)" rendered="#{highSchoolProcesso.habilitarImagemFranquia}">
+									<img src="#{highSchoolProcesso.imagem}" width="60%" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="ID Venda"
+								style="width:80px;text-align:center;"
+								sortBy="#{highSchool.vendas.idvendas}" styleClass="alinharCenter">
+								<p:commandLink
+									action="#{highSchoolMB.buscarHighSchool(highSchoolProcesso)}"
+									onclick="PF('controle').show();" title="Salvar Controle"
+									rendered="#{highSchoolMB.linkIdGerente}">
+									<h:outputText value="#{highSchoolProcesso.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolProcesso)}" />
+								</p:commandLink>
+								<p:commandLink  rendered="#{highSchoolMB.linkIdFranquias}">
+									<h:outputText value="#{highSchoolProcesso.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolProcesso)}" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Data Venda"
+								sortBy="#{highSchoolProcesso.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{highSchoolProcesso.vendas.dataVenda}"
+									style="#{highSchoolMB.cor(highSchoolProcesso)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:150px; "
+								sortBy="#{highSchoolProcesso.vendas.dataVenda}">
+								<h:outputText value="#{highSchoolProcesso.vendas.cliente.nome}"
+									style="#{highSchoolMB.corNome(highSchoolProcesso)}" />
+							</p:column>
+							<p:column headerText="Data Início"
+								sortBy="#{highSchoolProcesso.inicioAnoInicio}" style="width:125px;">
+								<h:outputText value="#{highSchoolProcesso.inicioAnoInicio}"
+									style="#{highSchoolMB.cor(highSchoolProcesso)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;"
+								sortBy="#{highSchoolProcesso.vendas.unidadenegocio.nomeFantasia}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{highSchoolProcesso.vendas.unidadenegocio.nomerelatorio}"
+									style="#{highSchoolMB.cor(highSchoolProcesso)}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:150px;"
+								sortBy="#{highSchoolProcesso.vendas.usuario.nome}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{highSchoolProcesso.vendas.usuario.nome}"
+									style="#{highSchoolMB.cor(highSchoolProcesso)}" />
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{highSchoolMB.editar(highSchoolProcesso)}"
+									title="Editar" style="text-decoration: none"
+									disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaProcesso" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Imprimir"
+								rendered="#{highSchoolMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton
+									action="#{highSchoolMB.fichaHighSchool(highSchoolProcesso)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">
+								</h:commandButton>
+							</p:column> 
+							<p:column headerText="Opções" style="width:75px;text-align:center;">
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade"
+									style="background:#F0F0F0;width:800px; border:none;">
+									<p:outputLabel
+										value="#{highSchoolProcesso.vendas.idvendas} - #{highSchoolProcesso.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid
+										style="width:100%;border-color:transparent;border:none;"
+										columns="8"> 
+										<p:commandLink action="#{highSchoolMB.boletos(highSchoolProcesso)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}"
+											title="IMPRIMIR OS BOLETOS" ajax="false" target="_blank">
+											<img src="../../resources/img/boletoFicha.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="BOLETOS" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+		
+										<p:commandLink
+											actionListener="#{highSchoolMB.buscarHighSchool(highSchoolProcesso)}"
+											style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+											update="consultahighschool:dialog_obsTM"
+											oncomplete="PF('obstm').show()"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}">
+											<img src="#{highSchoolMB.retornarIconeObsTM(highSchoolProcesso)}" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="OBS" style="font-size:11px;" />
+												<p:outputLabel value="TM" />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink
+											action="#{highSchoolMB.contrato(highSchoolProcesso)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}"
+											title="IMPRIMIR O CONTRATO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiContrato.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="CONTRATO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+										<p:commandLink
+											action="#{highSchoolMB.gerarRelatorioTermoVisto(highSchoolProcesso)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}"
+											title="IMPRIMIR O TERMO DE VISTO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiVisto.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="TERMO" style="font-size:11px;" />
+												<p:outputLabel value="VISTO" />
+											</h:panelGrid>
+										</p:commandLink>
+										<p:commandLink
+											action="#{highSchoolMB.gerarRelatorioRecibo(highSchoolProcesso)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}"
+											title="IMPRIMIR O RECIBO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiRecibo.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="RECIBO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink action="#{highSchoolMB.documentacao(highSchoolProcesso)}"
+											title="DOCUMENTOS" update=":consultahighschool:growl"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}">
+											<img src="../../resources/img/arquivosUpload.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="DOCS" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+		
+										<p:commandLink action="#{highSchoolMB.informacoes(highSchoolProcesso)}"
+											title="INFORMAÇÕES DA VENDA"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}">
+											<img src="../../resources/img/informacao.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="INFO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink
+												action="#{highSchoolMB.visualizarContasReceber(highSchoolProcesso)}"
+												title="VISUALIZAR CONTAS A RECEBER" 
+												
+												 >
+												<img src="../../resources/img/invoice.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;"> 
+													<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+													<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+												</h:panelGrid>
+											</p:commandLink> 
+										<p:commandLink
+											action="#{highSchoolMB.cancelarVenda(highSchoolProcesso.vendas)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolProcesso)}"
+											style="text-decoration: none" title="CANCELAR FICHA"
+											update="tabelaConsultaProcesso">
+											<p:confirm header="Cancelamento"
+												message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+											<img src="../../resources/img/cancel.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="CANCELAR" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+									</h:panelGrid>
+								</p:overlayPanel>        
+							</p:column>    
+						</p:dataTable>         
+					</p:tab>
+					<p:tab title="Financeiro (#{highSchoolMB.nFichasFinanceiro})" titleStyle="font-size:11px;">
+						<p:dataTable id="tabelaConsultaFinanceiro" var="highSchoolFinanceiro"
+							value="#{highSchoolMB.listaVendasFinanceiro}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" rows="15"
+							style="margin-bottom:20px">
+							<p:column style="text-align:center;width:40px;">
+								<p:commandLink title="FINANCEIRO (FICHA EM ANÁLISE NO DEPARTAMENTO FINANCEIRO)"
+									action="#{highSchoolMB.buscarHighSchool(highSchoolFinanceiro)}"
+									onclick="PF('liberarficha').show();"
+									rendered="#{highSchoolMB.imagemSituacaoUsuario(highSchoolFinanceiro)}">
+									<img src="#{highSchoolFinanceiro.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink title="FINANCEIRO (FICHA EM ANÁLISE NO DEPARTAMENTO FINANCEIRO)" rendered="#{highSchoolFinanceiro.habilitarImagemFranquia}">
+									<img src="#{highSchoolFinanceiro.imagem}" width="60%" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="ID Venda"
+								style="width:80px;text-align:center;"
+								sortBy="#{highSchoolFinanceiro.vendas.idvendas}" styleClass="alinharCenter">
+								<p:commandLink
+									action="#{highSchoolMB.buscarHighSchool(highSchoolFinanceiro)}"
+									onclick="PF('controle').show();" title="Salvar Controle"
+									rendered="#{highSchoolMB.linkIdGerente}">
+									<h:outputText value="#{highSchoolFinanceiro.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolFinanceiro)}" />
+								</p:commandLink>
+								<p:commandLink  rendered="#{highSchoolMB.linkIdFranquias}">
+									<h:outputText value="#{highSchoolFinanceiro.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolFinanceiro)}" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Data Venda"
+								sortBy="#{highSchoolFinanceiro.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{highSchoolFinanceiro.vendas.dataVenda}"
+									style="#{highSchoolMB.cor(highSchoolFinanceiro)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:150px; "
+								sortBy="#{highSchoolFinanceiro.vendas.dataVenda}">
+								<h:outputText value="#{highSchoolFinanceiro.vendas.cliente.nome}"
+									style="#{highSchoolMB.corNome(highSchoolFinanceiro)}" />
+							</p:column>
+							<p:column headerText="Data Início"
+								sortBy="#{highSchoolFinanceiro.inicioAnoInicio}" style="width:125px;">
+								<h:outputText value="#{highSchoolFinanceiro.inicioAnoInicio}"
+									style="#{highSchoolMB.cor(highSchoolFinanceiro)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;"
+								sortBy="#{highSchoolFinanceiro.vendas.unidadenegocio.nomeFantasia}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{highSchoolFinanceiro.vendas.unidadenegocio.nomerelatorio}"
+									style="#{highSchoolMB.cor(highSchoolFinanceiro)}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:150px;"
+								sortBy="#{highSchoolFinanceiro.vendas.usuario.nome}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{highSchoolFinanceiro.vendas.usuario.nome}"
+									style="#{highSchoolMB.cor(highSchoolFinanceiro)}" />
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{highSchoolMB.editar(highSchoolFinanceiro)}"
+									title="Editar" style="text-decoration: none"
+									disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaFinanceiro" />
+								</p:commandLink>
+							</p:column>     
+							<p:column headerText="Imprimir"
+								rendered="#{highSchoolMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton
+									action="#{highSchoolMB.fichaHighSchool(highSchoolFinanceiro)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">
+								</h:commandButton>
+							</p:column> 
+							<p:column headerText="Opções" style="width:75px;text-align:center;">
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade"
+									style="background:#F0F0F0;width:850px; border:none;">
+									<p:outputLabel
+										value="#{highSchoolFinanceiro.vendas.idvendas} - #{highSchoolFinanceiro.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid
+										style="width:100%;border-color:transparent;border:none;"
+										columns="9"> 
+										<p:commandLink action="#{highSchoolMB.boletos(highSchoolFinanceiro)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}"
+											title="IMPRIMIR OS BOLETOS" ajax="false" target="_blank">
+											<img src="../../resources/img/boletoFicha.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="BOLETOS" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+		
+										<p:commandLink
+											actionListener="#{highSchoolMB.buscarHighSchool(highSchoolFinanceiro)}"
+											style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+											update="consultahighschool:dialog_obsTM"
+											oncomplete="PF('obstm').show()"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}">
+											<img src="#{highSchoolMB.retornarIconeObsTM(highSchoolFinanceiro)}" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="OBS" style="font-size:11px;" />
+												<p:outputLabel value="TM" />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink
+											action="#{highSchoolMB.contrato(highSchoolFinanceiro)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}"
+											title="IMPRIMIR O CONTRATO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiContrato.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="CONTRATO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+										<p:commandLink
+											action="#{highSchoolMB.gerarRelatorioTermoVisto(highSchoolFinanceiro)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}"
+											title="IMPRIMIR O TERMO DE VISTO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiVisto.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="TERMO" style="font-size:11px;" />
+												<p:outputLabel value="VISTO" />
+											</h:panelGrid>
+										</p:commandLink>
+										<p:commandLink
+											action="#{highSchoolMB.gerarRelatorioRecibo(highSchoolFinanceiro)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}"
+											title="IMPRIMIR O RECIBO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiRecibo.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="RECIBO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink action="#{highSchoolMB.documentacao(highSchoolFinanceiro)}"
+											title="DOCUMENTOS" update=":consultahighschool:growl"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}">
+											<img src="../../resources/img/arquivosUpload.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="DOCS" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+		
+										<p:commandLink action="#{highSchoolMB.informacoes(highSchoolFinanceiro)}"
+											title="INFORMAÇÕES DA VENDA"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}">
+											<img src="../../resources/img/informacao.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="INFO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>    
+										</p:commandLink> 
+										<p:commandLink
+												action="#{highSchoolMB.visualizarContasReceber(highSchoolFinanceiro)}"
+												title="VISUALIZAR CONTAS A RECEBER" 
+												
+												 >
+												<img src="../../resources/img/invoice.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;"> 
+													<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+													<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+												</h:panelGrid>
+											</p:commandLink> 
+										<p:commandLink
+											action="#{highSchoolMB.cancelarVenda(highSchoolFinanceiro.vendas)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinanceiro)}"
+											style="text-decoration: none" title="CANCELAR FICHA"
+											update="tabelaConsultaFinanceiro">
+											<p:confirm header="Cancelamento"
+												message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+											<img src="../../resources/img/cancel.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="CANCELAR" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+									</h:panelGrid>
+								</p:overlayPanel>        
+							</p:column>
+						</p:dataTable>         
+					</p:tab>
+					
+					<p:tab title="Finalizado (#{highSchoolMB.nFichasFinalizadas})" titleStyle="font-size:11px;">
+						<p:dataTable id="tabelaConsultaFinalizado" var="highSchoolFinalizado"
+							value="#{highSchoolMB.listaVendasFinalizada}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" rows="15"
+							style="margin-bottom:20px">
+							<p:column style="text-align:center;width:40px;">
+								<p:commandLink title="FICHA FINALIZADA"
+									action="#{highSchoolMB.buscarHighSchool(highSchoolFinalizado)}"
+									onclick="PF('liberarficha').show();"
+									rendered="#{highSchoolMB.imagemSituacaoUsuario(highSchoolFinalizado)}">
+									<img src="#{highSchoolFinalizado.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink title="FICHA FINALIZADA" rendered="#{highSchoolFinalizado.habilitarImagemFranquia}">
+									<img src="#{highSchoolFinalizado.imagem}" width="60%" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="ID Venda"
+								style="width:80px;text-align:center;"
+								sortBy="#{highSchoolFinalizado.vendas.idvendas}" styleClass="alinharCenter">
+								<p:commandLink
+									action="#{highSchoolMB.buscarHighSchool(highSchoolFinalizado)}"
+									onclick="PF('controle').show();" title="Salvar Controle"
+									rendered="#{highSchoolMB.linkIdGerente}">
+									<h:outputText value="#{highSchoolFinalizado.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolFinalizado)}" />
+								</p:commandLink>     
+								<p:commandLink  rendered="#{highSchoolMB.linkIdFranquias}">
+									<h:outputText value="#{highSchoolFinalizado.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolFinalizado)}" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Data Venda"
+								sortBy="#{highSchoolFinalizado.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{highSchoolFinalizado.vendas.dataVenda}"
+									style="#{highSchoolMB.cor(highSchoolFinalizado)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:150px; "
+								sortBy="#{highSchoolFinalizado.vendas.dataVenda}">
+								<h:outputText value="#{highSchoolFinalizado.vendas.cliente.nome}"
+									style="#{highSchoolMB.corNome(highSchoolFinalizado)}" />
+							</p:column>
+							<p:column headerText="Data Início" style="width:125px;" sortBy="#{highSchoolFinalizado.inicioAnoInicio}">
+								<h:outputText value="#{highSchoolFinalizado.inicioAnoInicio}"
+									style="#{highSchoolMB.cor(highSchoolFinalizado)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;"
+								sortBy="#{highSchoolFinalizado.vendas.unidadenegocio.nomeFantasia}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{highSchoolFinalizado.vendas.unidadenegocio.nomerelatorio}"
+									style="#{highSchoolMB.cor(highSchoolFinalizado)}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:150px;"
+								sortBy="#{highSchoolFinalizado.vendas.usuario.nome}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{highSchoolFinalizado.vendas.usuario.nome}"
+									style="#{highSchoolMB.cor(highSchoolFinalizado)}" />
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{highSchoolMB.editar(highSchoolFinalizado)}"
+									title="Editar" style="text-decoration: none"
+									disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaFinalizado" />
+								</p:commandLink>
+							</p:column>     
+							<p:column headerText="Imprimir"
+								rendered="#{highSchoolMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton
+									action="#{highSchoolMB.fichaHighSchool(highSchoolFinalizado)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">
+								</h:commandButton>
+							</p:column> 
+							<p:column headerText="Opções" style="width:75px;text-align:center;">
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade"
+									style="background:#F0F0F0;width:850px; border:none;">
+									<p:outputLabel
+										value="#{highSchoolFinalizado.vendas.idvendas} - #{highSchoolFinalizado.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid
+										style="width:100%;border-color:transparent;border:none;"
+										columns="9"> 
+										<p:commandLink action="#{highSchoolMB.boletos(highSchoolFinalizado)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}"
+											title="IMPRIMIR OS BOLETOS" ajax="false" target="_blank">
+											<img src="../../resources/img/boletoFicha.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="BOLETOS" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+		
+										<p:commandLink
+											actionListener="#{highSchoolMB.buscarHighSchool(highSchoolFinalizado)}"
+											style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+											update="consultahighschool:dialog_obsTM"
+											oncomplete="PF('obstm').show()"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}">
+											<img src="#{highSchoolMB.retornarIconeObsTM(highSchoolFinalizado)}" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="OBS" style="font-size:11px;" />
+												<p:outputLabel value="TM" />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink
+											action="#{highSchoolMB.contrato(highSchoolFinalizado)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}"
+											title="IMPRIMIR O CONTRATO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiContrato.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="CONTRATO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+										<p:commandLink
+											action="#{highSchoolMB.gerarRelatorioTermoVisto(highSchoolFinalizado)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}"
+											title="IMPRIMIR O TERMO DE VISTO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiVisto.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="TERMO" style="font-size:11px;" />
+												<p:outputLabel value="VISTO" />
+											</h:panelGrid>
+										</p:commandLink>
+										<p:commandLink
+											action="#{highSchoolMB.gerarRelatorioRecibo(highSchoolFinalizado)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}"
+											title="IMPRIMIR O RECIBO" ajax="false" target="_blank">
+											<img src="../../resources/img/imprimiRecibo.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="RECIBO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink> 
+										<p:commandLink action="#{highSchoolMB.documentacao(highSchoolFinalizado)}"
+											title="DOCUMENTOS" update=":consultahighschool:growl"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}">
+											<img src="../../resources/img/arquivosUpload.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="DOCS" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>
+		
+										<p:commandLink action="#{highSchoolMB.informacoes(highSchoolFinalizado)}"
+											title="INFORMAÇÕES DA VENDA"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}">
+											<img src="../../resources/img/informacao.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="INFO" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>    
+										</p:commandLink> 
+										<p:commandLink
+												action="#{highSchoolMB.visualizarContasReceber(highSchoolFinalizado)}"
+												title="VISUALIZAR CONTAS A RECEBER" 
+												
+												 >
+												<img src="../../resources/img/invoice.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;"> 
+													<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+													<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+												</h:panelGrid>
+											</p:commandLink> 
+										<p:commandLink
+											action="#{highSchoolMB.cancelarVenda(highSchoolFinalizado.vendas)}"
+											disabled="#{highSchoolMB.botoesHabilitados(highSchoolFinalizado)}"
+											style="text-decoration: none" title="CANCELAR FICHA"
+											update="tabelaConsultaFinalizado">
+											<p:confirm header="Cancelamento"
+												message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+											<img src="../../resources/img/cancel.png" width="36" />
+											<h:panelGrid columns="1" style="text-align:1px;">
+												<p:outputLabel value="CANCELAR" style="font-size:11px;" />
+												<p:outputLabel value=" " />
+											</h:panelGrid>
+										</p:commandLink>       
+									</h:panelGrid>
+								</p:overlayPanel>          
+							</p:column>
+						</p:dataTable>         
+					</p:tab>
+					<p:tab title="Cancelado (#{highSchoolMB.nFichaCancelada})" titleStyle="font-size:11px;">
+						<p:dataTable id="tabelaConsultaCancelada" var="highSchoolCancelada"
+							value="#{highSchoolMB.listaVendasCancelada}" class="tabelaHighSchool"
+							scrollable="true" scrollHeight="300" rows="15"
+							style="margin-bottom:20px">
+							<p:column style="text-align:center;width:40px;">
+								<p:commandLink title="FICHA CANCELADA"
+									action="#{highSchoolMB.buscarHighSchool(highSchoolCancelada)}"
+									onclick="PF('liberarficha').show();"
+									rendered="#{highSchoolMB.imagemSituacaoUsuario(highSchoolCancelada)}">
+									<img src="#{highSchoolCancelada.imagem}" width="60%" />
+								</p:commandLink>
+								<p:commandLink title="FICHA CANCELADA" rendered="#{highSchoolCancelada.habilitarImagemFranquia}">
+									<img src="#{highSchoolCancelada.imagem}" width="60%" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="ID Venda"
+								style="width:80px;text-align:center;"
+								sortBy="#{highSchoolCancelada.vendas.idvendas}" styleClass="alinharCenter">
+								<p:commandLink
+									action="#{highSchoolMB.buscarHighSchool(highSchoolCancelada)}"
+									onclick="PF('controle').show();" title="Salvar Controle"
+									rendered="#{highSchoolMB.linkIdGerente}">
+									<h:outputText value="#{highSchoolCancelada.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolCancelada)}" />
+								</p:commandLink>     
+								<p:commandLink  rendered="#{highSchoolMB.linkIdFranquias}">
+									<h:outputText value="#{highSchoolCancelada.vendas.idvendas}"
+										style="#{highSchoolMB.cor(highSchoolCancelada)}" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="Data Venda"
+								sortBy="#{highSchoolCancelada.vendas.dataVenda}"
+								style="text-align:center;width:115px;">
+								<h:outputText value="#{highSchoolCancelada.vendas.dataVenda}"
+									style="#{highSchoolMB.cor(highSchoolCancelada)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:150px; "
+								sortBy="#{highSchoolCancelada.vendas.dataVenda}">
+								<h:outputText value="#{highSchoolCancelada.vendas.cliente.nome}"
+									style="#{highSchoolMB.corNome(highSchoolCancelada)}" />
+							</p:column>
+							<p:column headerText="Data Início" style="width:125px;" sortBy="#{highSchoolCancelada.inicioAnoInicio}">
+								<h:outputText value="#{highSchoolCancelada.inicioAnoInicio}"
+									style="#{highSchoolMB.cor(highSchoolCancelada)}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;"
+								sortBy="#{highSchoolCancelada.vendas.unidadenegocio.nomeFantasia}"
+								styleClass="alinharCenter">
+								<h:outputText
+									value="#{highSchoolCancelada.vendas.unidadenegocio.nomerelatorio}"
+									style="#{highSchoolMB.cor(highSchoolCancelada)}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:150px;"
+								sortBy="#{highSchoolCancelada.vendas.usuario.nome}"
+								styleClass="alinharCenter">
+								<h:outputText value="#{highSchoolCancelada.vendas.usuario.nome}"
+									style="#{highSchoolMB.cor(highSchoolCancelada)}" />
+							</p:column>
+							<p:column style="width:43px;text-align:center;">
+								<p:commandLink action="#{highSchoolMB.editar(highSchoolCancelada)}"
+									title="Editar" style="text-decoration: none"
+									disabled="#{highSchoolMB.botoesHabilitados(highSchoolCancelada)}">
+									<img src="../../resources/img/editaricon.png" width="28" />
+									<p:ajax event="dialogReturn" process="@this"
+										update="tabelaConsultaCancelada" />
+								</p:commandLink>
+							</p:column>         
+							<p:column headerText="Imprimir"
+								rendered="#{highSchoolMB.esconderFicha}"
+								style="width:58px;text-align:center;" styleClass="alinharCenter">
+								<h:commandButton
+									action="#{highSchoolMB.fichaHighSchool(highSchoolCancelada)}"
+									title="Ficha" image="../../resources/img/imprimiFicha.png"
+									ajax="false" onclick="this.form.target='_blank'"
+									style="width:30px;margin-left:4%">
+								</h:commandButton>
+							</p:column> 
+							<p:column headerText="Opções" style="width:75px;text-align:center;">  
+								<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+									<img src="../../resources/img/informacaoVendaVerde.png" />
+								</p:commandLink>
+								<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+									hideEffect="fade" style="background:#F0F0F0;width:400px;">
+									<p:outputLabel
+										value="#{highSchoolCancelada.vendas.idvendas} - #{highSchoolCancelada.vendas.cliente.nome}"
+										style="text-align:center;font-size:15px;" />
+									<br />
+									<br />
+									<h:panelGrid style="width:100%;border-color:transparent;border:none;" columns="9"> 
+											
+											<p:commandLink action="#{highSchoolMB.relatorioTermoQuitacao(highSchoolCancelada)}"
+													style="text-decoration: none" title="IMPRIMIR TERMO"
+													 >
+													<img src="../../resources/img/cancel.png" style="width: 36" />
+														<h:panelGrid columns="1" style="text-align:center;">
+															<p:outputLabel value="IMPRIMIR TERMO" style="font-size:10px;"/>
+															<p:outputLabel value="CANCELAMENTO" style="font-size:10px;"/>
+														</h:panelGrid>
+											</p:commandLink>   
+											
+											<p:commandLink action="#{highSchoolMB.documentacao(highSchoolCancelada)}"
+												update=":consultahighschool:growl" title="DOCUMENTOS"
+												 >
+												<img src="../../resources/img/imprimirFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;">
+													<p:outputLabel value="DOCS" style="font-size:10px;"/>
+													<p:outputLabel value=" "/>
+												</h:panelGrid>
+											</p:commandLink>
+											<p:commandLink action="#{highSchoolMB.verificarIdCredito(highSchoolCancelada)}"
+												update=":consultahighschool:growl" title="Verificar ID de Crédito"
+												 >
+												<img src="../../resources/img/numerosFicha.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;">
+													<p:outputLabel value="VISUALIZAR" style="font-size:10px;"/>
+													<p:outputLabel value="ID CRÉDITO" style="font-size:10px;"/>
+												</h:panelGrid>
+											</p:commandLink>
+									</h:panelGrid>    
+								</p:overlayPanel>   
+							</p:column> 
+						</p:dataTable>         
+					</p:tab>
+					<p:tab title="Todos (#{highSchoolMB.numeroFichas})" titleStyle="font-size: 11px" >
+						<p:dataTable id="tabelaConsultaHighSchool" var="highSchool"
+						value="#{highSchoolMB.listaHighSchool}" class="tabelaHighSchool"
+						scrollable="true" scrollHeight="300" rows="15"
+						style="margin-bottom:20px">
+						<p:column style="text-align:center;width:40px;">
+							<p:commandLink title="#{highSchool.tituloFicha}"
+								action="#{highSchoolMB.buscarHighSchool(highSchool)}"
+								onclick="PF('liberarficha').show();"
+								rendered="#{highSchoolMB.imagemSituacaoUsuario(highSchool)}">
+								<img src="#{highSchool.imagem}" width="60%" />
+							</p:commandLink>
+							<p:commandLink title="#{highSchool.tituloFicha}" rendered="#{highSchool.habilitarImagemFranquia}">
+								<img src="#{highSchool.imagem}" width="60%" />
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="ID Venda"
+							style="width:80px;text-align:center;"
+							sortBy="#{highSchool.vendas.idvendas}" styleClass="alinharCenter">
+							<p:commandLink
+								action="#{highSchoolMB.buscarHighSchool(highSchool)}"
+								onclick="PF('controle').show();" title="Salvar Controle"
+								rendered="#{highSchoolMB.linkIdGerente}">
+								<h:outputText value="#{highSchool.vendas.idvendas}"
+									style="#{highSchoolMB.cor(highSchool)}" />
+							</p:commandLink>
+							<p:commandLink  rendered="#{highSchoolMB.linkIdFranquias}">
+								<h:outputText value="#{highSchool.vendas.idvendas}"
+									style="#{highSchoolMB.cor(highSchool)}" />
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="Data Venda"
+							sortBy="#{highSchool.vendas.dataVenda}"
+							style="text-align:center;width:115px;">
+							<h:outputText value="#{highSchool.vendas.dataVenda}"
+								style="#{highSchoolMB.cor(highSchool)}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Cliente" style="width:150px; "
+							sortBy="#{highSchool.vendas.dataVenda}">
+							<h:outputText value="#{highSchool.vendas.cliente.nome}"
+								style="#{highSchoolMB.corNome(highSchool)}" />
+						</p:column>
+						<p:column headerText="Data Início" 
+							sortBy="#{highSchool.inicioAnoInicio}" style="width:125px;">
+							<h:outputText value="#{highSchool.inicioAnoInicio}"
+								style="#{highSchoolMB.cor(highSchool)}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Unidade" style="width:120px;"
+							sortBy="#{highSchool.vendas.unidadenegocio.nomeFantasia}"
+							styleClass="alinharCenter">
+							<h:outputText
+								value="#{highSchool.vendas.unidadenegocio.nomerelatorio}"
+								style="#{highSchoolMB.cor(highSchool)}" />
+						</p:column>
+						<p:column headerText="Consultor" style="width:150px;"
+							sortBy="#{highSchool.vendas.usuario.nome}"
+							styleClass="alinharCenter">
+							<h:outputText value="#{highSchool.vendas.usuario.nome}"
+								style="#{highSchoolMB.cor(highSchool)}" />
+						</p:column>
+						<p:column style="width:43px;text-align:center;">
+							<p:commandLink action="#{highSchoolMB.editar(highSchool)}"
+								title="Editar" style="text-decoration: none"
+								disabled="#{highSchoolMB.botoesHabilitados(highSchool)}">
+								<img src="../../resources/img/editaricon.png" width="28" />
+								<p:ajax event="dialogReturn" process="@this"
+									update="tabelaConsultaHighSchool" />
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="Imprimir"
+							rendered="#{highSchoolMB.esconderFicha}"
+							style="width:58px;text-align:center;" styleClass="alinharCenter">
+							<h:commandButton
+								action="#{highSchoolMB.fichaHighSchool(highSchool)}"
+								title="Ficha" image="../../resources/img/imprimiFicha.png"
+								ajax="false" onclick="this.form.target='_blank'"
+								style="width:30px;margin-left:4%">
+							</h:commandButton>
+						</p:column>
+						<p:column headerText="Opções" style="width:75px;text-align:center;">
+							<p:commandLink id="btnInformacoes" title="Visualizar opções.">
+								<img src="../../resources/img/informacaoVendaVerde.png" />
+							</p:commandLink>
+							<p:overlayPanel id="painelInformacoes" for="btnInformacoes"
+								hideEffect="fade"
+								style="background:#F0F0F0;width:850px; border:none;">
+								<p:outputLabel
+									value="#{highSchool.vendas.idvendas} - #{highSchool.vendas.cliente.nome}"
+									style="text-align:center;font-size:15px;" />
+								<br />
+								<br />
+								<h:panelGrid
+									style="width:100%;border-color:transparent;border:none;"
+									columns="9">
+	
+									<p:commandLink action="#{highSchoolMB.boletos(highSchool)}"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}"
+										title="IMPRIMIR OS BOLETOS" ajax="false" target="_blank">
+										<img src="../../resources/img/boletoFicha.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="BOLETOS" style="font-size:11px;" />
+											<p:outputLabel value=" " />
+										</h:panelGrid>
+									</p:commandLink>
+	
+									<p:commandLink
+										actionListener="#{highSchoolMB.buscarHighSchool(highSchool)}"
+										style="text-decoration: none" title="OBSERVAÇÕES GERÊNCIAS TM"
+										update="consultahighschool:dialog_obsTM"
+										oncomplete="PF('obstm').show()"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}">
+										<img src="#{highSchoolMB.retornarIconeObsTM(highSchool)}" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="OBS" style="font-size:11px;" />
+											<p:outputLabel value="TM" />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink
+										action="#{highSchoolMB.contrato(highSchool)}"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}"
+										title="IMPRIMIR O CONTRATO" ajax="false" target="_blank">
+										<img src="../../resources/img/imprimiContrato.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="CONTRATO" style="font-size:11px;" />
+											<p:outputLabel value=" " />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink
+										action="#{highSchoolMB.gerarRelatorioTermoVisto(highSchool)}"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}"
+										title="IMPRIMIR O TERMO DE VISTO" ajax="false" target="_blank">
+										<img src="../../resources/img/imprimiVisto.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="TERMO" style="font-size:11px;" />
+											<p:outputLabel value="VISTO" />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink
+										action="#{highSchoolMB.gerarRelatorioRecibo(highSchool)}"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}"
+										title="IMPRIMIR O RECIBO" ajax="false" target="_blank">
+										<img src="../../resources/img/imprimiRecibo.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="RECIBO" style="font-size:11px;" />
+											<p:outputLabel value=" " />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink action="#{highSchoolMB.documentacao(highSchool)}"
+										title="DOCUMENTOS" update=":consultahighschool:growl"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}">
+										<img src="../../resources/img/arquivosUpload.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="DOCS" style="font-size:11px;" />
+											<p:outputLabel value=" " />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink action="#{highSchoolMB.informacoes(highSchool)}"
+										title="INFORMAÇÕES DA VENDA"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}">
+										<img src="../../resources/img/informacao.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="INFO" style="font-size:11px;" />
+											<p:outputLabel value=" " />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink
+												action="#{highSchoolMB.visualizarContasReceber(highSchool)}"
+												title="VISUALIZAR CONTAS A RECEBER" 
+												
+												 >
+												<img src="../../resources/img/invoice.png" width="36" />
+												<h:panelGrid columns="1" style="text-align:center;"> 
+													<p:outputLabel value="CONTAS A" style="font-size:10px;"/>
+													<p:outputLabel value="RECEBER" style="font-size:10px;"/>
+												</h:panelGrid>
+											</p:commandLink> 
+									<p:commandLink
+										action="#{highSchoolMB.cancelarVenda(highSchool.vendas)}"
+										disabled="#{highSchoolMB.botoesHabilitados(highSchool)}"
+										style="text-decoration: none" title="CANCELAR FICHA"
+										update="tabelaConsultaHighSchool">
+										<p:confirm header="Cancelamento"
+											message="Deseja Cancelar Ficha?" icon="ui-icon-alert" />
+										<img src="../../resources/img/cancel.png" width="36" />
+										<h:panelGrid columns="1" style="text-align:1px;">
+											<p:outputLabel value="CANCELAR" style="font-size:11px;" />
+											<p:outputLabel value=" " />
+										</h:panelGrid>
+									</p:commandLink>
+								</h:panelGrid>
+							</p:overlayPanel>
+						</p:column>
+					</p:dataTable>     
+				</p:tab>
+				</p:tabView>
+				<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="background:#DDDDE1;">
+			    	<div align="center">
+				        <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"  style="font-size:12px;"/>
+				        <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"  style="font-size:12px;"/>
+			        </div>  
+			    </p:confirmDialog>  
+				<br></br> <br></br>
+				<p:dialog id="dialog_obsTM" header="Obs TM" widgetVar="obstm"
+					style="background:#d0e9c6;text-align: left">
+					<br></br>
+					<p:inputTextarea id="idObstm"
+						value="#{highSchoolMB.highSchool.obstm}" rows="10" cols="50"
+						queryDelay="750" minQueryLength="4" readonly="true" />
+					<br></br>
+					<br></br>
+					<br></br>
+				</p:dialog>
+				<p:dialog showEffect="fade" hideEffect="fade" icon="ui-icon-alert"
+					widgetVar="controle" style="width:30%;font-size:14px">
+					<p:outputLabel value="Salvar controle desta ficha?" />
+					<br></br>
+					<br></br>
+					<p:commandButton value="Sim"
+						action="#{highSchoolMB.salvarControle()}"
+						oncomplete="PF('cd').hide();" styleClass="ui-confirmdialog-yes"
+						icon="ui-icon-check" update="consultahighschool:growl"
+						style="margin-left:13%;font-size:12px" />
+					<p:commandButton value="Não" oncomplete="PF('cd').hide();"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+						update="consultahighschool:growl" style="font-size:12px" />
+				</p:dialog>
+				<p:dialog showEffect="fade" hideEffect="fade" header="Confirmação"
+					icon="ui-icon-alert" widgetVar="liberarficha"
+					style="width:30%;font-size:14px">
+					<p:outputLabel
+						value="LIBERAR FICHA? Ficha será liberar para finalizar." />
+					<br></br>
+					<br></br>
+					<p:commandButton value="Sim"
+						action="#{highSchoolMB.liberarFicha()}"
+						oncomplete="PF('liberarficha').hide();"
+						styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
+						update="consultahighschool:growl"
+						style="margin-left:30%;font-size:12px" />
+					<p:commandButton value="Não"
+						oncomplete="PF('liberarficha').hide();"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+						update="consultahighschool:growl" style="font-size:12px" />
+				</p:dialog>
+				<style>
+				.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td,
+					.ui-datatable tfoot th {
+					padding: 2px 2px;
+					overflow: hidden;
+					border-width: 0px;
+					border-style: solid;
+				}
+				.ui-confirm-dialog-message {
+				    display: inline-block;
+				    margin-top: 1px;
+				    font-size: 17px !important;
+				}  
+			</style>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

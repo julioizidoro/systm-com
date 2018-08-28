@@ -1,0 +1,841 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/pages/templates/default.xhtml">
+	<ui:define name="corpo">
+		<h:form id="followUp" style="font-size:12px;">
+			<div id="centro">
+				<p:growl id="growl" showDetail="true" sticky="false" life="#{aplicacaoMB.parametrosprodutos.tempomensagens}"/>
+				<p:accordionPanel id="painelPesquisa" class="painel" activeIndex="-1" rendered="#{followUpMB.painelConsultor()}">
+					<p:tab titleStyle="color:#000;font-size:11px;background:#c7d95f;"
+						title="Pesquisar">
+						<h:panelGrid columns="4"
+							columnClasses="tamanhoavisos, tamanhoavisos,tamanhoavisos, tamanhoavisos"  
+							style="width:90%;margin-left:1%;">
+							<p:outputLabel value="Nome/Email" for="cliente" />
+							<p:outputLabel value="Situação"/>
+							<p:outputLabel value="Programa"/>
+							<p:outputLabel value="Pais"/>
+  
+							<p:inputText id="cliente" value="#{followUpMB.nomeCliente}" style="width:90%">
+								<p:ajax event="blur"/>
+							</p:inputText>
+							<p:selectOneMenu id="situacaolead" style="width:200px;" 
+								value="#{followUpMB.situacao}" filter="true" filterMatchMode="startsWith">
+								<f:selectItem itemLabel="Selecione" itemValue="0" />
+								<f:selectItem itemLabel="Novo Lead" itemValue="1" />
+								<f:selectItem itemLabel="Primeiro Contato" itemValue="2" />
+								<f:selectItem itemLabel="Prospect" itemValue="3" />
+								<f:selectItem itemLabel="Oportunidade Real" itemValue="4" />
+								<f:selectItem itemLabel="Negociação Final" itemValue="5" />
+								<f:selectItem itemLabel="Pós Venda" itemValue="6" />
+								<f:selectItem itemLabel="Lead Cancelada" itemValue="7" />
+								<f:selectItem itemLabel="Lead Stand By" itemValue="8" />
+							</p:selectOneMenu>
+							<p:selectOneMenu id="produtolead" value="#{followUpMB.programas}"
+								style="width:90%;" converter="ProdutoConverter" filter="true"
+								filterMatchMode="startsWith">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItems id="idproduto"
+									value="#{followUpMB.listaProgramas}" var="cproduto"
+									itemLabel="#{cproduto.descricao}" itemValue="#{cproduto}" />
+								<f:attribute name="listaProdutos"
+									value="#{followUpMB.listaProgramas}" />
+							</p:selectOneMenu>		
+							
+							<p:selectOneMenu id="pais" value="#{followUpMB.paisConsulta}"
+								style="width:200px;" converter="PaisConverterS"
+								filter="true" filterMatchMode="startsWith"
+								panelStyle="width:180px"  >
+								<f:selectItem itemLabel="País" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idpais" value="#{followUpMB.listaPaisConsulta}"
+									var="cpais" itemLabel="#{cpais.nome}"
+									itemValue="#{cpais}" />
+								<f:attribute name="listaPais" value="#{followUpMB.listaPaisConsulta}" />
+								<p:ajax event="change"/>  
+							</p:selectOneMenu>
+							<p:outputLabel />
+						</h:panelGrid>
+						<br></br>
+						<h:panelGrid columns="4"
+							columnClasses="tamanhoavisos, tamanhoavisos,tamanho7, tamanho1"
+							style="width:90%;margin-left:1%;">
+							<p:outputLabel value="Período Próximo Contato" />
+							<p:outputLabel value="Período Último Contato" />
+							<p:outputLabel />
+							<p:outputLabel />
+
+							<h:panelGroup>
+								<p:calendar id="dataProxIni"
+									value="#{followUpMB.dataProxInicio}" size="12" locale="pt"
+									pattern="dd/MM/yyyy" mask="true" maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+								<p:calendar id="dataProxFinal"
+									value="#{followUpMB.dataProxFinal}" size="12" locale="pt"
+									pattern="dd/MM/yyyy" mask="true" maxlength="15"
+									style="margin-left:5%;">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+							</h:panelGroup>
+							<h:panelGroup>
+								<p:calendar id="dataUltIni" value="#{followUpMB.dataUltInicio}"
+									size="12" locale="pt" pattern="dd/MM/yyyy" mask="true"
+									maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+								<p:calendar id="dataUltFinal" value="#{followUpMB.dataUltFinal}"
+									size="12" locale="pt" pattern="dd/MM/yyyy" mask="true"
+									style="margin-left:5%;" maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />            
+									<p:ajax event="blur" />
+								</p:calendar>
+							</h:panelGroup>            
+							<p:commandButton value="Pesquisar" icon=" ui-icon-search " 
+								actionListener="#{followUpMB.filtrarPesquisa()}" id="btnConfirmarLead"
+								action="#{followUpMB.pesquisarPosVenda()}" update=":followUp:panelPosLead, :followUp:tabelaLeads, :followUp:panelBotoes, :followUp:growl, :followUp:panelTabelaLead, :followUp:btnNovos
+								    		 "/>
+							<p:commandButton value="Limpar" icon="ui-icon-arrowrefresh-1-w"
+								action="#{followUpMB.limparPesquisa()}" update="@form" />
+						</h:panelGrid>
+					</p:tab>
+				</p:accordionPanel>   
+				<p:accordionPanel id="painelPesquisaGerencial" class="painel" activeIndex="-1" rendered="#{followUpMB.painelGerencial()}">
+					<p:tab titleStyle="color:#000;font-size:11px;background:#c7d95f;"  
+						title="Pesquisar">
+						<h:panelGrid columns="4"
+							columnClasses="tamanho8, tamanho8,tamanho8,tamanho8"
+							style="width:100%;"> 
+							<p:outputLabel value="Nome/Email"/>  
+							<p:outputLabel value="Unidade" style="margin-left:2%;"/>   
+							<p:outputLabel value="Consultor" />  
+							<p:outputLabel value="Programa"/>
+   
+							<p:inputText value="#{followUpMB.nomeCliente}" style="width:92%;" title="Nome do Cliente">
+								<p:ajax event="blur"/>
+							</p:inputText>
+							<p:selectOneMenu id="unidade"
+								value="#{followUpMB.unidadenegocio}" style="width:90%;margin-left:2%;" disabled="#{followUpMB.habilitarComboUnidade}"
+								converter="UnidadeNegocioConverter" filter="true" filterMatchMode="startsWith" panelStyle="width:180px">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItems id="idunidade"  
+									value="#{followUpMB.listaUnidade}" var="unidade"
+									itemLabel="#{unidade.nomerelatorio}" itemValue="#{unidade}" />
+								<f:attribute name="listaUnidade"
+									value="#{followUpMB.listaUnidade}" />
+								<p:ajax event="change" listener="#{followUpMB.gerarListaConsultor()}" update="consultor"/>
+							</p:selectOneMenu>   
+							<p:selectOneMenu id="consultor" value="#{followUpMB.usuario}"
+								style="width:90%;" filter="true" filterMatchMode="startsWith"
+								converter="UsuarioConverter"
+								disabled="#{followUpMB.habilitarComboUsuario}">
+								<f:selectItem itemLabel="Selecione" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idconsultor"
+									value="#{followUpMB.listaUsuario}" var="sUsuario"
+									itemLabel="#{sUsuario.nome}" itemValue="#{sUsuario}" />
+								<f:attribute name="listaUsuario"
+									value="#{followUpMB.listaUsuario}" />
+								<p:ajax event="change"/>   
+							</p:selectOneMenu>   
+							<p:selectOneMenu id="produto" value="#{followUpMB.programas}"
+								style="width:90%;" converter="ProdutoConverter" filter="true"
+								filterMatchMode="startsWith">
+								<f:selectItem itemLabel="Todos" itemValue="0" />
+								<f:selectItems id="idproduto"
+									value="#{followUpMB.listaProgramas}" var="cproduto"
+									itemLabel="#{cproduto.descricao}" itemValue="#{cproduto}" />
+								<f:attribute name="listaProdutos"
+									value="#{followUpMB.listaProgramas}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+						<br></br>
+						<h:panelGrid columns="5"
+							columnClasses="tamanho8,tamanho8,tamanho8, tamanho8, tamanho8"
+							style="width:99.5%;">
+							<p:outputLabel value="Tipo Contato" />  
+							<p:outputLabel value="Situação"/>  
+							<p:outputLabel value="Período Próximo Contato" />
+							<p:outputLabel value="Período Último Contato" />
+							<p:outputLabel value="Status"/>
+ 
+							<p:selectOneMenu id="tipo"
+								value="#{followUpMB.tipocontato}"
+								style="width:80%;" filter="true" converter="TipoContatoConverter"
+								filterMatchMode="startsWith" panelStyle="width:180px">
+								<f:selectItem itemLabel="Selecione" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idTipoContatoHistorico"
+									value="#{followUpMB.listaTipoContato}"
+									var="tipocontatohistorico" itemLabel="#{tipocontatohistorico.tipo}"
+									itemValue="#{tipocontatohistorico}" />
+								<f:attribute name="listaTipocontato"
+									value="#{followUpMB.listaTipoContato}" />
+								<p:ajax event="change" />
+							</p:selectOneMenu>
+							<p:selectOneMenu id="tipovenda" style="width:80%;" 
+								value="#{followUpMB.situacao}" filter="true" filterMatchMode="startsWith">
+								<f:selectItem itemLabel="Selecione" itemValue="0" />
+								<f:selectItem itemLabel="Lead Recebido" itemValue="1" />
+								<f:selectItem itemLabel="Primeiro Contato" itemValue="2" />
+								<f:selectItem itemLabel="Prospect" itemValue="3" />
+								<f:selectItem itemLabel="Oportunidade Real" itemValue="4" />
+								<f:selectItem itemLabel="Negociação Final" itemValue="5" />
+								<f:selectItem itemLabel="Pós Venda" itemValue="6" />
+								<f:selectItem itemLabel="Lead Cancelada" itemValue="7" />
+								<f:selectItem itemLabel="Lead Stand By" itemValue="8" />
+							</p:selectOneMenu>
+							<h:panelGroup>
+								<p:calendar id="dataProxIni"
+									value="#{followUpMB.dataProxInicio}" size="9" locale="pt"
+									pattern="dd/MM/yyyy" mask="true" maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+								<p:calendar id="dataProxFinal"
+									value="#{followUpMB.dataProxFinal}" size="9" locale="pt"
+									pattern="dd/MM/yyyy" mask="true" maxlength="15"
+									style="margin-left:5%;">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+							</h:panelGroup>
+							<h:panelGroup style="width:100%">
+								<p:calendar id="dataUltIni" value="#{followUpMB.dataUltInicio}"
+									size="9" locale="pt" pattern="dd/MM/yyyy" mask="true"
+									maxlength="15">  
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+								<p:calendar id="dataUltFinal" value="#{followUpMB.dataUltFinal}"
+									size="9" locale="pt" pattern="dd/MM/yyyy" mask="true"
+									style="margin-left:5%;" maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />  
+								</p:calendar>
+							</h:panelGroup>      
+							<p:selectOneMenu id="status" style="width:90%;" 
+								value="#{followUpMB.status}" filter="true" filterMatchMode="startsWith">
+								<f:selectItem itemLabel="Selecione" itemValue="0" /> 
+								<f:selectItem itemLabel="Novos" itemValue="Novos" />
+								<f:selectItem itemLabel="Atrasados" itemValue="Atrasados" />
+								<f:selectItem itemLabel="Hoje" itemValue="Hoje" />
+								<f:selectItem itemLabel="Prox. 7 Dias" itemValue="Prox. 7 Dias" />
+								<f:selectItem itemLabel="Todos" itemValue="Todos" /> 
+							</p:selectOneMenu> 
+						</h:panelGrid>
+						<br/>   
+						<h:panelGrid columns="3"  
+							columnClasses="tamanho8, tamanho8, tamanho8"
+							style="width:98%;">
+							<p:outputLabel value="Pais"/> 
+							<p:outputLabel value="Período de Recebimento" />  
+							<p:outputLabel/>
+							
+
+						 
+														
+							<p:selectOneMenu id="pais" value="#{followUpMB.paisConsulta}"
+								style="width:200px;" converter="PaisConverterS"
+								filter="true" filterMatchMode="startsWith"
+								panelStyle="width:180px"  >
+								<f:selectItem itemLabel="País" itemValue="0"
+									noSelectionOption="true" />
+								<f:selectItems id="idpais" value="#{followUpMB.listaPaisConsulta}"
+									var="cpais" itemLabel="#{cpais.nome}"
+									itemValue="#{cpais}" />
+								<f:attribute name="listaPais" value="#{followUpMB.listaPaisConsulta}" />
+								<p:ajax event="change"/>  
+							</p:selectOneMenu>
+							
+								<h:panelGroup style="width:100%">
+								<p:calendar id="dataInseridoInicial" value="#{followUpMB.dataInseridoInicial}"
+									size="10" locale="pt" pattern="dd/MM/yyyy" mask="true"
+									maxlength="15">  
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+								<p:calendar id="dataInseridoFinal" value="#{followUpMB.dataInseridoFinal}"
+									size="10" locale="pt" pattern="dd/MM/yyyy" mask="true"
+									style="margin-left:2%;" maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />   
+									<p:ajax event="blur" />  
+								</p:calendar>
+							</h:panelGroup>     
+							<h:panelGroup> 
+								<p:commandButton value="Limpar" icon="ui-icon-arrowrefresh-1-w" style="font-size:11px;margin-left:1%;float:right;"
+									action="#{followUpMB.limparPesquisa()}" update="@form" />
+								<p:commandButton value="Pesquisar" icon=" ui-icon-search "
+									actionListener="#{followUpMB.filtrarPesquisa()}" id="btnConfirmarLead"
+								    action="#{followUpMB.pesquisarPosVenda()}" update=":followUp:panelPosLead, :followUp:tabelaLeads, :followUp:panelBotoes, :followUp:growl, :followUp:panelTabelaLead, :followUp:btnNovos
+								    		 " style="font-size:11px;float:right;"/>
+								  <p:defaultCommand target="btnConfirmarLead" />
+							</h:panelGroup>
+						</h:panelGrid>   
+					</p:tab>     
+				</p:accordionPanel>  
+				<br></br>
+				<br></br>
+				<h:panelGrid style="margin-left:3%;width:90%;" columns="2" id="panelBotoes"
+					columnClasses="tamanho9, tamanhoavisos">
+					<h:panelGroup id="painelBotoes">
+						<h:panelGrid style="width:90%;" columns="7">
+							<img src="../../resources/img/crm/logoLead.png" width="190" />
+							<p:commandLink id="btnNovos" style="margin-left:1%;"
+								action="#{followUpMB.mudarCoresBotões('novos')}" update="@form">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img
+										src="../../resources/img/crm/#{followUpMB.imagemNovos}.png"
+										width="40" />
+									<p:outputLabel value="NOVOS" style="font-size:12px;" />
+									<p:outputLabel value="(#{followUpMB.novos})"
+										style="font-size:12px;margin-bottom: -12px;" />
+								</h:panelGrid>
+							</p:commandLink>
+							<p:commandLink id="btnAtrasados" style="margin-left:2%;"
+								action="#{followUpMB.mudarCoresBotões('atrasados')}"
+								update="@form">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img
+										src="../../resources/img/crm/#{followUpMB.imagemAtrasados}.png"
+										width="40" />
+									<p:outputLabel value="ATRASADOS" style="font-size:12px;" />
+									<p:outputLabel value="(#{followUpMB.atrasados})"
+										style="font-size:12px;margin-bottom: -12px;" />
+								</h:panelGrid>
+							</p:commandLink>
+							<p:commandLink id="btnHoje" style="margin-left:2%;"
+								action="#{followUpMB.mudarCoresBotões('hoje')}" update="@form">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img src="../../resources/img/crm/#{followUpMB.imagemHoje}.png"
+										width="40" />
+									<p:outputLabel value="HOJE" style="font-size:12px;" />
+									<p:outputLabel value="(#{followUpMB.hoje})"
+										style="font-size:12px;margin-bottom: -12px;" />
+								</h:panelGrid>
+							</p:commandLink>
+							<p:commandLink id="btnProx" style="margin-left:2%;"
+								action="#{followUpMB.mudarCoresBotões('prox')}" update="@form">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img src="../../resources/img/crm/#{followUpMB.imagemProx}.png"
+										width="40" />
+									<p:outputLabel value="PROX" style="font-size:12px;" />
+									<p:outputLabel value="7 DIAS (#{followUpMB.prox7})"
+										style="font-size:12px;margin-bottom: -12px;" />
+								</h:panelGrid>
+							</p:commandLink>
+							<p:commandLink id="btnTodos" style="margin-left:2%;"
+								action="#{followUpMB.mudarCoresBotões('todos')}" update="@form">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img
+										src="../../resources/img/crm/#{followUpMB.imagemTodos}.png"
+										width="40" />
+									<p:outputLabel value="TODOS" style="font-size:12px;" />
+									<p:outputLabel value="(#{followUpMB.todos})"
+										style="font-size:12px;margin-bottom: -12px;" />
+								</h:panelGrid>
+							</p:commandLink>  
+							<p:commandLink id="btnPosVenda" style="margin-left:2%;"
+								action="#{followUpMB.mudarCoresBotões('posvenda')}" update="@form">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img src="../../resources/img/crm/#{followUpMB.imagemPosVenda}.png"
+										width="40" />
+									<p:outputLabel value="PÓS VENDA" style="font-size:12px;" />
+									<p:outputLabel value="(#{followUpMB.posvenda})"
+										style="font-size:12px;margin-bottom: -12px;" />
+								</h:panelGrid>
+							</p:commandLink>
+						</h:panelGrid> 
+					</h:panelGroup>
+					<h:panelGroup>
+						<div align="right">
+							<p:commandLink id="btnNovoLead" action="#{followUpMB.novoLead()}">
+								<h:panelGrid columns="1" style="text-align:center;">
+									<img src="../../resources/img/crm/novoLead.png" width="55" />
+									<p:outputLabel value="NOVO LEAD" style="font-size:12px;" />
+								</h:panelGrid>
+								<p:ajax event="dialogReturn"
+									listener="#{followUpMB.retornoNovaLead}"
+									update="@form" />
+							</p:commandLink>
+						</div>
+					</h:panelGroup>
+				</h:panelGrid>
+				<br></br>  
+				<h:panelGrid style="width:98%;margin-left:1%;" columns="1" rendered="#{followUpMB.mostrarLeads}" id="panelTabelaLead">
+					<p:dataTable id="tabelaLeads" var="lead" scrollable="true" scrollHeight="400"
+						value="#{followUpMB.listaLead}" style="font-size:11px;"
+						editable="true" editMode="cell" rowIndexVar="rowIndex" reflow="true">
+
+						<p:ajax event="cellEdit" update="tabelaLeads, :followUp:growl" />
+   
+						    
+						<p:column headerText="Nome" style="text-align:left;" width="130" sortBy="#{lead.cliente.nome}">
+							<p:commandLink id="btnNomeCliente" title="Alterações de dados do cliente" value="#{lead.cliente.nome}"
+								action="#{followUpMB.alterarDadosCliente(lead.cliente)}">
+								<p:ajax event="dialogReturn" listener="#{followUpMB.retornoDialogDados}" update="tabelaLeads, :followUp:growl"/>
+							</p:commandLink> 
+						</p:column>
+						<p:column headerText="Unidade" style="text-align:left;" sortBy="#{lead.unidadenegocio.nomerelatorio}"
+							width="95" rendered="#{followUpMB.acessoResponsavelUnidade}">
+							<h:outputText value="#{lead.unidadenegocio.nomerelatorio}" />
+						</p:column>    
+						<p:column headerText="Consultor" style="text-align:left;" sortBy="#{lead.usuario.nome}"
+							width="110" rendered="#{followUpMB.acessoResponsavelUnidade}">
+							<h:outputText value="#{lead.usuario.nome}" />
+						</p:column>
+						<p:column headerText="Programa" style="text-align:left;" width="100"  sortBy="#{lead.produtos.descricao}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText id="outputProduto"
+										value="#{lead.produtos.descricao}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:selectOneMenu id="produto" value="#{followUpMB.produto}"
+										style="width:90%;" converter="ProdutoConverter" filter="true"
+										filterMatchMode="startsWith" panelStyle="width:180px">
+										<f:selectItem itemLabel="Selecione" itemValue="0"
+											noSelectionOption="true" />
+										<f:selectItems value="#{followUpMB.listaProdutos}"
+											var="produtos" itemLabel="#{produtos.descricao}"
+											itemValue="#{produtos}" />
+										<f:attribute name="listaProdutos"
+											value="#{followUpMB.listaProdutos}" />
+										<p:ajax event="change"
+											listener="#{followUpMB.atualizarFollowUp(lead)}"
+											update="@all" />
+									</p:selectOneMenu>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column headerText="País" style="text-align:left;" width="95" sortBy="#{lead.pais.nome}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText id="outputPais"
+										value="#{lead.pais.nome}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:selectOneMenu id="pais" value="#{followUpMB.pais}"
+										style="width:90%;" converter="PaisConverterS"
+										filter="true" filterMatchMode="startsWith"
+										panelStyle="width:180px"  >
+										<f:selectItem itemLabel="País" itemValue="0"
+											noSelectionOption="true" />
+										<f:selectItems id="idpais" value="#{followUpMB.listaPais}"
+											var="cpais" itemLabel="#{cpais.nome}"   
+											itemValue="#{cpais}" />
+										<f:attribute name="listaPais" value="#{followUpMB.listaPais}" />
+										<p:ajax event="change" listener="#{followUpMB.atualizarFollowUp(lead)}" update="outputPais, pais"/>  
+									</p:selectOneMenu>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>    
+						<p:column headerText="Situação" width="60" sortBy="#{lead.situacao}"  
+							style="text-align:center;">
+							<h:outputText value="#{lead.situacao}" class="badge bg-warning"
+								style="background-color:#{followUpMB.retornarCoresSituacao(lead.situacao)};padding: 6px 8px;" />
+						</p:column>
+
+						<p:column headerText="Tipo" width="70" style="text-align:left;" sortBy="#{lead.tipocontato.tipo}">
+							<h:outputText value="#{lead.tipocontato.tipo}" />  
+						</p:column>   
+						<p:column headerText="Data Receb." width="80" style="text-align:center;" sortBy="#{lead.dataenvio}">
+							<h:outputText value="#{lead.dataenvio}" title="Data de Recimento">
+								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" />
+							</h:outputText>   
+						</p:column>
+						<p:column headerText="Último Contato" width="80"  sortBy="#{lead.dataultimocontato}" 
+							style="text-align:center;">
+							<h:outputText value="#{lead.dataultimocontato}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Próximo Contato" width="85" sortBy="#{lead.dataproximocontato}"
+							style="text-align:center;">
+							<h:outputText value="#{lead.dataproximocontato}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>             
+						<p:column headerText="Publicidade" style="text-align:left;" width="100" sortBy="#{posvenda.lead.publicidade.descricao}">
+							<h:outputText value="#{lead.publicidade.descricao}" />
+						</p:column> 
+						<p:column headerText="" width="130"    
+							style="text-align:left;" id="emitirInformacoes"> 
+							<p:commandLink id="btnHistorico" title="Visualizar Histórico do Cliente"
+								action="#{followUpMB.historicoCliente(rowIndex)}">
+								<img src="../../resources/img/crm/historico.png" width="25" />
+							</p:commandLink>
+							<p:commandLink id="btnEmitirVenda" title="Emissão de vendas" rendered="#{followUpMB.habiltiarVenda(lead)}"
+										action="#{followUpMB.emitirVenda(lead)}" 
+										>
+										<img src="../../resources/img/crm/emitirvendas.png"
+											width="30" />
+											<p:ajax event="dialogReturn" listener="#{followUpMB.retornoDialogEmissao}" update="@form"/>
+							</p:commandLink>
+							<p:commandLink id="btnEmissao" style="border-color:transparent;border:none;"
+								title="Emissão de vendas" rendered="#{followUpMB.habiltiarCamposHe(lead)}">
+									<img src="../../resources/img/crm/emitirvendas.png" width="30" />
+							</p:commandLink>
+							<p:overlayPanel id="painelInformacoesHe" for="btnEmissao"
+									hideEffect="fade" style="background:#F0F0F0;width:450px;">
+									<h:panelGrid
+									style="width:100%;border-color:transparent;border:transparent;"
+									columns="4">
+									
+									<p:commandLink id="btnQuestionario" 
+										action="#{followUpMB.emitirVendaQuestionario(lead)}" 
+										style="margin-left:8%;border:transparent;">
+										<h:panelGrid columns="1" style="text-align:center;border:transparent;">
+											<img src="../../resources/img/questionarioPhoto.png" width="48" />
+											<p:outputLabel value="QUESTIONÁRIO" style="font-size:11px;" />
+											<p:outputLabel value=" " style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+
+									<p:commandLink id="btnFormAssessoria" 
+										action="#{followUpMB.emitirVendaFormulario(lead)}" 
+										style="margin-left:8%;">
+										<h:panelGrid columns="1" style="text-align:center;">
+											<img src="../../resources/img/crm/emitirorcamentomanual.png" width="48" />
+											<p:outputLabel value="FORMULÁRIO" style="font-size:11px;" />
+											<p:outputLabel value="ASSESSORIA" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink id="btnFichaFinal" 
+										action="#{followUpMB.emitirVendaFinal(lead)}" 
+										style="margin-left:8%;border:transparent;">
+										<h:panelGrid columns="1" style="text-align:center;border:transparent;">
+											<img src="../../resources/img/crm/emitirvendas.png" width="48" />
+											<p:outputLabel value="FICHA" style="font-size:11px;" />
+											<p:outputLabel value="FINAL" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+									
+								</h:panelGrid> 
+							</p:overlayPanel>  
+							<p:commandLink id="btnOrcamento" style="border-color:transparent;border:none;"
+								title="ORÇAMENTO" rendered="#{followUpMB.habiltiarCampos(lead)}">
+									<img src="../../resources/img/crm/orcamento.png" width="25" />
+							</p:commandLink>
+							<p:commandLink id="btnOrcamentoHE"
+								rendered="#{followUpMB.habilitarBotaoHe(lead)}"
+								title="Emissão de orçamento de HE" 
+								action="#{followUpMB.orcamentoHE(lead)}"
+								>
+								<img src="../../resources/img/crm/orcamento.png" width="25" />
+							</p:commandLink>
+							<p:overlayPanel id="painelInformacoes" for="btnOrcamento"
+									hideEffect="fade" style="background:#F0F0F0;width:450px;">
+									<h:panelGrid
+									style="width:100%;border-color:transparent;border:transparent;"
+									columns="4">
+									
+									<p:commandLink id="btnModeloOrcamento" rendered="#{followUpMB.habilitarCampoCursoModelo(lead)}"
+										action="#{followUpMB.orcamentoTarifarioModelo(lead)}"
+										style="margin-left:8%;border:transparent;">
+										<h:panelGrid columns="1" style="text-align:center;border:transparent;">
+											<img src="../../resources/img/crm/orcamento.png" width="48" />
+											<p:outputLabel value="ORÇAMENTO" style="font-size:11px;" />
+											<p:outputLabel value="MODELO" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+
+									<p:commandLink id="btnOrcamentoTarifario" rendered="#{followUpMB.habilitarCampoCurso(lead)}"
+										action="#{followUpMB.orcamentoTarifario(lead)}"
+										style="margin-left:8%;">
+										<h:panelGrid columns="1" style="text-align:center;">
+											<img src="../../resources/img/crm/orcamento.png" width="48" />
+											<p:outputLabel value="ORÇAMENTO" style="font-size:11px;" />
+											<p:outputLabel value="TARIFÁRIO" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink id="btnModeloOrcamentoVitrine" rendered="#{followUpMB.habilitarCampoCursoModelo(lead)}"
+										action="#{followUpMB.orcamentoVitrine()}"
+										style="margin-left:8%;border:transparent;">
+										<h:panelGrid columns="1" style="text-align:center;border:transparent;">
+											<img src="../../resources/img/crm/orcamento.png" width="48" />
+											<p:outputLabel value="ORÇAMENTO" style="font-size:11px;" />
+											<p:outputLabel value="VITRINE" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink id="btnOrcamentoManual" rendered="#{followUpMB.habilitarCampoCurso(lead)}"
+										title="Emissão de orçamento manual curso"
+										action="#{followUpMB.orcamentoManual(lead)}"
+										style="margin-left:8%;">  
+										<h:panelGrid columns="1" style="text-align:center;">
+											<img src="../../resources/img/crm/emitirorcamentomanual.png"
+												width="48" />
+											<p:outputLabel value="ORÇAMENTO" style="font-size:11px;" />
+											<p:outputLabel value="MANUAL" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+									
+									<p:commandLink id="btnOrcamentoVoluntariado"
+										rendered="#{followUpMB.habilitarCampoVoluntariado(lead)}"
+										title="Emissão orçamento tarifário de voluntariado"
+										action="#{followUpMB.novoOrcamentoVoluntariado(lead)}"
+										style="margin-left:8%;">
+										<h:panelGrid columns="1" style="text-align:center;">
+											<img src="../../resources/img/crm/orcamento.png" width="48" />
+											<p:outputLabel value="ORÇAMENTO" style="font-size:11px;" />
+											<p:outputLabel value="TARIFÁRIO" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+									<p:commandLink id="btnOrcamentoManualVoluntariado"
+										rendered="#{followUpMB.habilitarCampoVoluntariado(lead)}"
+										title="Emissão orçamento manual de voluntariado"
+										action="#{followUpMB.orcamentoManual(lead)}"
+										style="margin-left:8%;">
+										<h:panelGrid columns="1" style="text-align:center;">
+											<img src="../../resources/img/crm/emitirorcamentomanual.png"
+												width="48" />
+											<p:outputLabel value="ORÇAMENTO" style="font-size:11px;" />
+											<p:outputLabel value="MANUAL" style="font-size:11px;" />
+										</h:panelGrid>
+									</p:commandLink>
+								</h:panelGrid> 
+							</p:overlayPanel>  
+							<p:commandLink id="btnEncaminharLead" action="#{followUpMB.encaminharLead(lead)}"
+								title="Encaminhar Lead" >
+								<img src="../../resources/img/crm/envelope.png" width="25" />
+								<p:ajax event="dialogReturn"  listener="#{followUpMB.dialogReturnEncaminharLead}" update="tabelaLeads" />
+							</p:commandLink>
+						</p:column>  
+					</p:dataTable>
+				</h:panelGrid>
+				<p:dialog message="Trainee" showEffect="fade" hideEffect="fade"
+					width="40%" icon="ui-icon-alert" widgetVar="novaficha"
+					style="font-size:14px">
+					<p:outputLabel value="Qual país do estágio?" style="margin-left:2%" />
+					<br></br>
+					<br></br>
+					<p:commandLink
+						action="#{followUpMB.emitirVendaTrainee('Australia')}"
+						oncomplete="PF('novaficha').hide();"
+						styleClass="ui-confirmdialog-yes" update=":followUp:growl"
+						style="margin-left:2%;font-size:12px">
+						<img src="../../resources/img/AUS.png" />
+					</p:commandLink>
+					<p:commandLink
+						action="#{followUpMB.emitirVendaTrainee('EUA')}"
+						oncomplete="PF('novaficha').hide();"
+						styleClass="ui-confirmdialog-no" update=":followUp:growl"
+						style="font-size:12px;margin-left:8%;">
+						<img src="../../resources/img/USA.png" />
+					</p:commandLink>
+				</p:dialog>
+				<h:panelGrid style="width:98%;margin-left:1%;" columns="1" rendered="#{followUpMB.mostrarPosVenda}" id="panelPosLead">
+					<p:dataTable id="tabelaPosVenda" var="posvenda" scrollable="true" scrollHeight="400"
+						value="#{followUpMB.listaPosVenda}" style="font-size:11px;"
+						editable="true" editMode="cell" rowIndexVar="rowIndex"> 
+						<p:ajax event="cellEdit" update="tabelaPosVenda, :followUp:growl" /> 
+						<p:column headerText="Nome" style="text-align:left;" width="150" sortBy="#{posvenda.vendas.cliente.nome}">
+							<p:commandLink id="btnNomeCliente" title="Alterações de dados do cliente" value="#{posvenda.vendas.cliente.nome}"
+								action="#{followUpMB.alterarDadosCliente(posvenda.vendas.cliente)}">
+								<p:ajax event="dialogReturn" listener="#{followUpMB.retornoDialogDados}" update="tabelaPosVenda, :followUp:growl"/>
+							</p:commandLink>
+						</p:column>
+						<p:column headerText="Unidade" sortBy="#{posvenda.vendas.unidadenegocio.nomerelatorio}" style="text-align:left;"
+							width="95" rendered="#{followUpMB.acessoResponsavelUnidade}">
+							<h:outputText value="#{posvenda.vendas.unidadenegocio.nomerelatorio}" />
+						</p:column>    
+						<p:column headerText="Consultor" sortBy="#{posvenda.vendas.usuario.nome}" style="text-align:left;"
+							width="110" rendered="#{followUpMB.acessoResponsavelUnidade}">
+							<h:outputText value="#{posvenda.vendas.usuario.nome}" />
+						</p:column>
+						<p:column headerText="Programa" sortBy="#{posvenda.vendas.produtos.descricao}" style="text-align:left;" width="100">  
+							<h:outputText value="#{posvenda.lead.produtos.descricao}" /> 
+						</p:column>
+						<p:column headerText="País" sortBy="#{posvenda.vendas.fornecedorcidade.cidade.pais.nome}" style="text-align:left;" width="100">  
+							<h:outputText id="outputPais"
+									value="#{posvenda.vendas.fornecedorcidade.cidade.pais.nome}" /> 
+						</p:column>    
+						<p:column headerText="Situação" width="60" sortBy="#{posvenda.lead.situacao}"  
+							style="text-align:center;">
+							<h:outputText value="#{posvenda.lead.situacao}" class="badge bg-warning"
+								style="background-color:#{followUpMB.retornarCoresSituacao(posvenda.lead.situacao)};padding: 6px 8px;" />
+						</p:column>
+
+						<p:column headerText="Tipo" width="95" style="text-align:left;" sortBy="#{posvenda.lead.tipocontato.tipo}">
+							<h:outputText value="#{posvenda.lead.tipocontato.tipo}" />  
+						</p:column>   
+						<p:column headerText="Data Embarque" width="80" style="text-align:center;" sortBy="#{posvenda.dataembarque}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{posvenda.dataembarque}" title="Data de Recimento">
+										<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" />
+									</h:outputText>   
+								</f:facet>
+								<f:facet name="input">
+									<p:calendar id="dataembarque"
+										value="#{posvenda.dataembarque}"
+										size="12" locale="pt" pattern="dd/MM/yyyy">
+										<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" />
+										<p:ajax event="dateSelect" listener="#{followUpMB.salvarDataControle(posvenda)}" update="tabelaPosVenda"/>
+									</p:calendar>
+								</f:facet>
+							</p:cellEditor>  
+						</p:column>
+						<p:column headerText="Data Chegada" width="80" sortBy="#{posvenda.datachegada}" 
+							style="text-align:center;">
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{posvenda.datachegada}" title="Data de Recimento">
+										<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" />
+									</h:outputText>   
+								</f:facet>
+								<f:facet name="input">
+									<p:calendar id="datachegada"
+										value="#{posvenda.datachegada}"
+										size="12" locale="pt" pattern="dd/MM/yyyy">
+										<f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo" />
+										<p:ajax event="dateSelect" listener="#{followUpMB.salvarDataControle(posvenda)}" update="tabelaPosVenda"/>
+									</p:calendar>
+								</f:facet>
+							</p:cellEditor>  
+						</p:column>
+						<p:column headerText="Próximo Contato" width="85" sortBy="#{posvenda.lead.dataproximocontato}"
+							style="text-align:center;">
+							<h:outputText value="#{posvenda.lead.dataproximocontato}">
+								<f:convertDateTime pattern="dd/MM/yyyy"
+									timeZone="America/Sao_Paulo" />
+							</h:outputText>
+						</p:column>        
+						<p:column headerText="Publicidade" style="text-align:left;" width="100" sortBy="#{posvenda.lead.publicidade.descricao}">
+							<h:outputText value="#{posvenda.lead.publicidade.descricao}" />
+						</p:column>  
+						<p:column headerText="" width="75"    
+							style="text-align:center;">
+							<p:commandLink id="btnHistorico" title="Visualizar Histórico do Cliente"
+								action="#{followUpMB.historicoCliente(posvenda.lead)}">
+								<img src="../../resources/img/crm/historico.png" width="30" />
+							</p:commandLink>
+							<p:commandLink id="btnEmitirVendaPos" title="Emissão de vendas"  
+								action="#{followUpMB.selecionarLead(posvenda.lead)}"
+								oncomplete="PF('escolhaprodutovenda').show();">
+								<img src="../../resources/img/crm/emitirvendas.png" width="30" />
+							</p:commandLink>
+						</p:column>    
+					</p:dataTable>
+					<p:dialog message="Escolha o Produto" showEffect="fade"
+						hideEffect="fade" width="20%" icon="ui-icon-alert"
+						widgetVar="escolhaprodutovenda" style="font-size:14px">
+						<p:outputLabel value="Programa"
+							style="margin-left:1%" />
+						<br></br>
+						<p:selectOneMenu id="produto" value="#{followUpMB.produto}"
+							style="width:90%;" converter="ProdutoConverter" filter="true"
+							filterMatchMode="startsWith" panelStyle="width:180px">
+							<f:selectItem itemLabel="Selecione" itemValue="0"
+								noSelectionOption="true" />
+							<f:selectItems value="#{followUpMB.listaProdutos}" var="produtos"
+								itemLabel="#{produtos.descricao}" itemValue="#{produtos}" />
+							<f:attribute name="listaProdutos"
+								value="#{followUpMB.listaProdutos}" />
+						</p:selectOneMenu>
+						<br></br>
+						<br></br>
+						<p:commandButton id="bntAddConta" icon="ui-icon-plus" action="#{followUpMB.emitirVendaPos()}"
+							class="botaoAdicionar" style="font-size:12px;margin-left:10%"
+							value="Emitir" oncomplete="PF('escolhaprodutovenda').hide();" />
+						<p:commandButton id="bntFechar" icon="ui-icon-plus"
+							class="botaoFechar" style="font-size:12px;margin-left:5%"
+							value="Fechar" oncomplete="PF('escolhaprodutovenda').hide();" />
+					</p:dialog>
+				</h:panelGrid>
+				<br></br>
+				<h:outputText value="1" class="badge bg-warning"
+					style="background-color:#1E90FF;padding: 4px 6px;margin-left:2%;" />
+				<h:outputText value="Novo Lead"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+
+				<h:outputText value="2" class="badge bg-warning"
+					style="background-color:#2E5495;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Primeiro Contato"
+					style="margin-left:0.5%;font-size:12px;color:#2E5495;" />
+
+				<h:outputText value="3" class="badge bg-warning"
+					style="background-color:#9ACD32;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Prospect"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+  
+				<h:outputText value="4" class="badge bg-warning"
+					style="background-color:#FF8C00;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Oportunidade Real"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+					
+				<h:outputText value="5" class="badge bg-warning"
+					style="background-color:#B22222;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Negociação Final"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+					
+				<h:outputText value="6" class="badge bg-warning"
+					style="background-color:#228B22;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Pós Venda"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+					
+				<h:outputText value="7" class="badge bg-warning"
+					style="background-color:#8B8989;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Lead Cancelada"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+					
+				<h:outputText value="8" class="badge bg-warning"
+					style="background-color:#9400D3;padding: 4px 6px;margin-left:3%;" />
+				<h:outputText value="Stand By"
+					style="margin-left:0.5%;font-size:12px;color:#3C4A58;" />
+			</div>
+			<style>
+				.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td,
+					.ui-datatable tfoot th {
+					padding: 2px 2px;
+					overflow: hidden;
+					border-width: 0px;   
+					border-style: solid;
+				}
+				.ui-confirm-dialog-message {
+				    display: inline-block;
+				    margin-top: 1px;
+				    font-size: 17px !important;
+				}      
+				.ui-accordion .ui-accordion-content {
+				    padding: 1em 2.2em;
+				    border-top: 0;
+				    margin-top: -2px;
+				    position: relative;
+				    top: 1px;
+				    margin-bottom: 2px; 
+				    overflow: inherit !important;  
+				    zoom: 1;   
+				} 
+				.row {
+				    margin-right: -11px;
+				    margin-left: -15px;
+				    overflow: hidden;
+				}
+				
+				</style> 
+			<br></br><br></br>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

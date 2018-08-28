@@ -1,0 +1,423 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/pages/templates/default.xhtml">
+	<ui:define name="corpo">
+		<h:form id="idControleWork" style="font-size:11px;">
+			<div id="centro">
+				<p:growl id="growl" showDetail="true" sticky="false"
+					life="#{aplicacaoMB.parametrosprodutos.tempomensagens}" />
+				<br></br> 
+				<p:accordionPanel class="painel" activeIndex="-1">
+					<p:tab titleStyle="color:#000;font-size:11px;background:#c7d95f;"
+						title="Pesquisar">
+						<h:panelGrid columns="4"
+							columnClasses="colunaSeis, width37, tamanho1, tamanho1"
+							style="width:90%;margin-left:3%;">
+							<p:outputLabel value="ID Vendas" for="idvenda" />
+							<p:outputLabel value="Cliente" for="cliente" />
+							<p:outputLabel value="Periodo" for="dataIni" />
+							<p:outputLabel value="" />
+
+							<p:inputText id="idvenda"
+								value="#{controleWorkAndTravelMB.idvenda}" style="width:90%" />
+							<p:inputText id="cliente"
+								value="#{controleWorkAndTravelMB.nomeCliente}" style="width:90%" />
+							<h:panelGroup>
+								<p:calendar id="dataIni"
+									value="#{controleWorkAndTravelMB.iniDataEmbarque}" size="10"
+									locale="pt" pattern="dd/MM/yyyy" mask="true" maxlength="15">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+								<p:calendar id="dataFinal"
+									value="#{controleWorkAndTravelMB.finalDataEmbarque}" size="10"
+									locale="pt" pattern="dd/MM/yyyy" mask="true" maxlength="15"
+									style="margin-left:2%;">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+									<p:ajax event="blur" />
+								</p:calendar>
+							</h:panelGroup>
+							<p:outputLabel value="" />
+						</h:panelGrid>
+						<br></br>
+						<h:panelGrid columns="3"
+							columnClasses="tamanho1, tamanho1, tamanho1"
+							style="width:91%;margin-left:3%;">
+							<p:outputLabel value="Programa" for="programa" />
+							<p:outputLabel value="Status do Processo" for="situacao" />
+							<p:outputLabel />
+
+							<p:selectOneMenu id="programa"
+								value="#{controleWorkAndTravelMB.programa}" style="width:125px;">
+								<f:selectItem itemLabel="TODOS" itemValue="TODOS" />
+								<f:selectItem itemLabel="Independent" itemValue="INDEPENDENT" />
+								<f:selectItem itemLabel="Premium" itemValue="PREMIUM" />
+								<p:ajax event="change" />
+							</p:selectOneMenu>
+							<p:selectOneMenu id="situacao"
+								value="#{controleWorkAndTravelMB.situacao}" style="width:130px;">
+								<f:selectItem itemLabel="TODOS" itemValue="TODOS" />
+								<f:selectItem itemLabel="Processo" itemValue="Processo" />
+								<f:selectItem itemLabel="Entrevista" itemValue="Entrevista" />
+								<f:selectItem itemLabel="Contratado" itemValue="Contratado" />
+								<f:selectItem itemLabel="Passagem/Visto"
+									itemValue="Passagem/Visto" />
+								<p:ajax event="change" />
+							</p:selectOneMenu>
+							<h:panelGroup>
+								<p:commandButton value="Pesquisar" icon=" ui-icon-search "
+									update=":idControleWork:acordionPainel"
+									action="#{controleWorkAndTravelMB.pesquisar()}" />
+								<p:commandButton value="Limpar" icon="ui-icon-arrowrefresh-1-w"
+									update="idControleWork:acordionPainel, dataFinal, dataIni, cliente, idvenda"
+									action="#{controleWorkAndTravelMB.limpar()}"
+									style="margin-left:2%;" />
+							</h:panelGroup>
+						</h:panelGrid>
+					</p:tab>
+				</p:accordionPanel>
+				<br></br>
+				<legend id="iUsu2">
+					<b>Work &amp; Travel</b>
+				</legend>
+				<p:tabView id="acordionPainel">
+					<p:tab title="Processo (#{controleWorkAndTravelMB.numeroProcesso})"
+						class="tab" titleStyle="font-size: 11px">
+						<p:dataTable id="tabelaControleWork" var="workAndTravel"
+							value="#{controleWorkAndTravelMB.listaProcesso}"
+							class="tabelaHighSchool" scrollable="true" scrollHeight="285"
+							style="margin-bottom:8px">
+							<p:column style="width:35px;text-align:center">
+								<img
+									src="#{controleWorkAndTravelMB.imagemSituacao(workAndTravel)}"
+									title="#{workAndTravel.statusprocesso}" />
+							</p:column>
+							<p:column headerText="ID Venda" style="width:60px;">
+								<h:outputText value="#{workAndTravel.vendas.idvendas}" />
+							</p:column>
+							<p:column headerText="Data Venda"
+								style="text-align:center;width:72px;">
+								<h:outputText value="#{workAndTravel.vendas.dataVenda}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:200px;">
+								<h:outputText value="#{workAndTravel.vendas.cliente.nome}" />
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;">
+								<h:outputText
+									value="#{workAndTravel.vendas.unidadenegocio.nomerelatorio}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:130px;">
+								<h:outputText value="#{workAndTravel.vendas.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Modalidade" style="width:100px;">
+								<h:outputText value="#{workAndTravel.modalidade}" />
+							</p:column>
+							<p:column headerText="Skype" style="width:140px;">
+								<h:outputText value="#{workAndTravel.vendas.cliente.skype}" />
+							</p:column>
+							<p:column headerText="E-mail" style="width:200px;">
+								<h:outputText value="#{workAndTravel.vendas.cliente.email}" />
+							</p:column>
+							<p:column headerText="Telefone" style="width:105px;">
+								<h:outputText
+									value="#{workAndTravel.vendas.cliente.foneCelular}" />
+							</p:column>
+							<p:column headerText="Nível Idioma" style="width:120px;">
+								<h:outputText
+									value="#{workAndTravel.vendas.worktravel.nivelidioma01}" />
+							</p:column>
+							<p:column headerText="Data Nasc."
+								style="text-align:center;width:72px;">
+								<h:outputText
+									value="#{workAndTravel.vendas.cliente.dataNascimento}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab
+						title="Entrevista (#{controleWorkAndTravelMB.numeroEntrevista})"
+						class="tab" titleStyle="font-size: 11px">
+						<p:dataTable id="tabelaControleEntrevista" var="entrevista"
+							value="#{controleWorkAndTravelMB.listaEntrevista}"
+							class="tabelaHighSchool" scrollable="true" scrollHeight="285"
+							style="margin-bottom:8px">
+							<p:column style="width:35px;text-align:center">
+								<img src="#{controleWorkAndTravelMB.imagemSituacao(entrevista)}"
+									title="#{entrevista.statusprocesso}" />
+							</p:column>
+							<p:column headerText="ID Venda" style="width:60px;">
+								<h:outputText value="#{entrevista.vendas.idvendas}" />
+							</p:column>
+							<p:column headerText="Data Venda"
+								style="text-align:center;width:72px;">
+								<h:outputText value="#{entrevista.vendas.dataVenda}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:200px;">
+								<h:outputText value="#{entrevista.vendas.cliente.nome}" />
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;">
+								<h:outputText
+									value="#{entrevista.vendas.unidadenegocio.nomerelatorio}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:130px;">
+								<h:outputText value="#{entrevista.vendas.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Modalidade" style="width:100px;">
+								<h:outputText value="#{entrevista.modalidade}" />
+							</p:column>
+							<p:column headerText="Skype" style="width:140px;">
+								<h:outputText value="#{entrevista.vendas.cliente.skype}" />
+							</p:column>
+							<p:column headerText="E-mail" style="width:200px;">
+								<h:outputText value="#{entrevista.vendas.cliente.email}" />
+							</p:column>
+							<p:column headerText="Telefone" style="width:105px;">
+								<h:outputText value="#{entrevista.vendas.cliente.foneCelular}" />
+							</p:column>
+							<p:column headerText="Nível Idioma" style="width:120px;">
+								<h:outputText
+									value="#{entrevista.vendas.worktravel.nivelidioma01}" />
+							</p:column>
+							<p:column headerText="Data Nasc."
+								style="text-align:center;width:72px;">
+								<h:outputText
+									value="#{entrevista.vendas.cliente.dataNascimento}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab id="tabelaContratado"
+						title="Contratado (#{controleWorkAndTravelMB.numeroContratado})"
+						class="tab" titleStyle="font-size: 11px">
+						<p:dataTable id="tabelaControleContratado" var="contratado"
+							value="#{controleWorkAndTravelMB.listaContratado}"
+							class="tabelaHighSchool" scrollable="true" scrollHeight="285"
+							style="margin-bottom:8px">
+							<p:column style="width:35px;text-align:center">
+								<p:commandLink
+									action="#{controleWorkAndTravelMB.cadControleWorkEmbarqueConsultor(contratado)}"
+									title="Visualizar/Cadastrar informações sobre embarque do cliente.">
+									<img
+										src="#{controleWorkAndTravelMB.imagemSituacao(contratado)}"
+										title="#{contratado.statusprocesso}" />
+									<p:ajax event="dialogReturn"
+										listener="#{controleWorkAndTravelMB.listarControle()}"
+										update="@form" />
+								</p:commandLink>
+							</p:column>
+							<p:column headerText="ID Venda" style="width:60px;">
+								<h:outputText value="#{contratado.vendas.idvendas}" />
+							</p:column>
+							<p:column headerText="Data Venda"
+								style="text-align:center;width:72px;">
+								<h:outputText value="#{contratado.vendas.dataVenda}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:200px;">
+								<h:outputText value="#{contratado.vendas.cliente.nome}" />
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;">
+								<h:outputText
+									value="#{contratado.vendas.unidadenegocio.nomerelatorio}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:130px;">
+								<h:outputText value="#{contratado.vendas.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Modalidade" style="width:100px;">
+								<h:outputText value="#{contratado.modalidade}" />
+							</p:column>
+							<p:column headerText="Skype" style="width:140px;">
+								<h:outputText value="#{contratado.vendas.cliente.skype}" />
+							</p:column>
+							<p:column headerText="E-mail" style="width:200px;">
+								<h:outputText value="#{contratado.vendas.cliente.email}" />
+							</p:column>
+							<p:column headerText="Telefone" style="width:105px;">
+								<h:outputText value="#{contratado.vendas.cliente.foneCelular}" />
+							</p:column>
+							<p:column headerText="Nível Idioma" style="width:120px;">
+								<h:outputText
+									value="#{contratado.vendas.worktravel.nivelidioma01}" />
+							</p:column>
+							<p:column headerText="Data Nasc."
+								style="text-align:center;width:72px;">
+								<h:outputText
+									value="#{contratado.vendas.cliente.dataNascimento}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Estado Destino" style="width:120px;">
+								<h:outputText
+									value="#{contratado.controleworkempregaor.workempregador.estado}" />
+							</p:column>
+							<p:column headerText="Cidade Destino" style="width:120px;">
+								<h:outputText
+									value="#{contratado.controleworkempregaor.workempregador.cidadepaisproduto.cidade.nome}" />
+							</p:column>
+							<p:column headerText="Colocação" style="width:120px;">
+								<h:outputText
+									value="#{contratado.controleworkempregaor.colocacao}" />
+							</p:column>
+							<p:column headerText="Sponsor" style="width:120px;">
+								<h:outputText
+									value="#{contratado.controleworksponsor.worksponsor.fornecedorcidade.fornecedor.nome}" />
+							</p:column>
+							<p:column headerText="Empregador" style="width:120px;">
+								<h:outputText
+									value="#{contratado.controleworkempregaor.workempregador.nome}" />
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab
+						title="Passagem/Visto (#{controleWorkAndTravelMB.numeroEmbarcado})"
+						class="tab" titleStyle="font-size: 11px">
+						<p:dataTable id="tabelaControleEmbarcado" var="embarcado"
+							value="#{controleWorkAndTravelMB.listaEmbarcado}"
+							class="tabelaHighSchool" scrollable="true" scrollHeight="285"
+							style="margin-bottom:8px">
+							<p:column style="width:35px;text-align:center">
+								<img src="#{controleWorkAndTravelMB.imagemSituacao(embarcado)}"
+									title="#{embarcado.statusprocesso}" />
+							</p:column>
+							<p:column headerText="ID Venda" style="width:60px;">
+								<h:outputText value="#{embarcado.vendas.idvendas}" />
+							</p:column>
+							<p:column headerText="Data Venda"
+								style="text-align:center;width:72px;">
+								<h:outputText value="#{embarcado.vendas.dataVenda}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Cliente" style="width:200px;">
+								<h:outputText value="#{embarcado.vendas.cliente.nome}" />
+							</p:column>
+							<p:column headerText="Unidade" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.vendas.unidadenegocio.nomerelatorio}" />
+							</p:column>
+							<p:column headerText="Consultor" style="width:130px;">
+								<h:outputText value="#{embarcado.vendas.usuario.nome}" />
+							</p:column>
+							<p:column headerText="Modalidade" style="width:100px;">
+								<h:outputText value="#{embarcado.modalidade}" />
+							</p:column>
+							<p:column headerText="Skype" style="width:140px;">
+								<h:outputText value="#{embarcado.vendas.cliente.skype}" />
+							</p:column>
+							<p:column headerText="E-mail" style="width:200px;">
+								<h:outputText value="#{embarcado.vendas.cliente.email}" />
+							</p:column>
+							<p:column headerText="Telefone" style="width:105px;">
+								<h:outputText value="#{embarcado.vendas.cliente.foneCelular}" />
+							</p:column>
+							<p:column headerText="Nível Idioma" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.vendas.worktravel.nivelidioma01}" />
+							</p:column>
+							<p:column headerText="Data Nasc."
+								style="text-align:center;width:72px;">
+								<h:outputText value="#{embarcado.vendas.cliente.dataNascimento}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Estado Destino" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.controleworkempregaor.workempregador.estado}" />
+							</p:column>
+							<p:column headerText="Cidade Destino" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.controleworkempregaor.workempregador.cidadepaisproduto.cidade.nome}" />
+							</p:column>
+							<p:column headerText="Colocação" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.controleworkempregaor.colocacao}" />
+							</p:column>
+							<p:column headerText="Sponsor" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.controleworksponsor.worksponsor.fornecedorcidade.fornecedor.nome}" />
+							</p:column>
+							<p:column headerText="Empregador" style="width:120px;">
+								<h:outputText
+									value="#{embarcado.controleworkempregaor.workempregador.nome}" />
+							</p:column>
+							<p:column headerText="Cia Aerea" style="width:120px">
+								<h:outputText value="#{embarcado.controleworkembarque.ciaaerea}" />
+							</p:column>
+							<p:column headerText="Aeroporto Chegada" style="width:150px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.aeroportochegada}" />
+							</p:column>
+							<p:column headerText="Nº Vôo" style="width:85px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.numerovoo}" />
+							</p:column>
+							<p:column headerText="Horário Chegada" style="width:75px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.horachegada}" />
+							</p:column>
+							<p:column headerText="Data Embarque" style="width:85px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.dataembarque}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Data Chegada" style="width:85px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.datachegada}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Data Retorno" style="width:85px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.dataretorno}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Situação Visto" style="width:110px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.situacaovisto}" />
+							</p:column>
+							<p:column headerText="Data Visto" style="width:85px;">
+								<h:outputText
+									value="#{embarcado.controleworkembarque.datavisto}">
+									<f:convertDateTime pattern="dd/MM/yyyy"
+										timeZone="America/Sao_Paulo" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="SEVIS" style="width:150px;">
+								<h:outputText value="#{embarcado.controleworkembarque.sevis}" />
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+				</p:tabView>
+				<br></br>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,147 @@
+<h:form id="cursospacotes" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" style="background:#ffffff;">
+	<div id="overlay" class="transparent">
+		<div id="centro">
+			<p:growl id="growl" showDetail="true" sticky="false"
+				life="#{aplicacaoMB.parametrosprodutos.tempomensagens}" /> 
+			<link href="../../resources/css/cssPacote.css" rel="stylesheet" />
+			<div style="margin-left: 2%; width: 98%;">
+			
+				<p:commandButton id="bntLead" icon="ui-icon-arrowreturnthick-1-w"
+						style="font-size:12px;" value="Voltar para Lead" rendered="#{pacotesMB.habilitarVoltaBtn}"
+						action="#{pacotesMB.retornaHistoricoLead()}" title="Retornar para Histórico da Lead" >
+				</p:commandButton>	
+				<div align="center">   
+					<p:outputLabel value="Atalho de Orçamento" style="font-size:24px;" />
+				</div>
+				<h:panelGroup id="panelTotalPais">
+					<p:scrollPanel id="pacotePais" rendered="#{pacotesMB.habilitarPais}">
+						<ui:repeat value="#{pacotesMB.listaPais}"     
+							var="pais">
+							<div class="col-md-2">
+								<div class="borderSombra" style="height: 200px;border-radius: 13px;background:#f5f3e5;">
+									<div style="height: 190px;">
+										<h:panelGrid columns="1" style="width:95%;margin-left:4%;">
+											<br />
+											<h:panelGroup>
+												<p:outputLabel value="#{pais.sigla}"
+													style="font-size:20px;margin-left:2%;color:green;" />
+												<br/><br />
+												<p:commandLink action="#{pacotesMB.consultarListarCursosPacotes(pais)}" 
+													update=":cursospacotes:growl, :cursospacotes:tabelapacotes, :cursospacotes:pacotePais, :cursospacotes:panelTotalPais, :cursospacotes:panelTotalPacotes">
+													<img src="#{pacotesMB.retornarIPais(pais)}"
+														width="40" style="width: 124px;height: 90px;border-radius: 30px;"/>
+												</p:commandLink>
+											</h:panelGroup>
+										</h:panelGrid>
+									</div>
+								</div>
+							</div>
+						</ui:repeat>
+					</p:scrollPanel>
+				</h:panelGroup>
+				<h:panelGroup id="panelTotalPacotes">
+					<p:scrollPanel id="tabelapacotes" mode="native" style="width:98%;" rendered="#{pacotesMB.habilitarPacotes}">
+						
+						<h:panelGroup rendered="#{pacotesMB.curso}">
+								<h:panelGroup>
+									<div id="divImagemAtalho" >
+										<img src="http://systm.com.br:82/systm/atalhoOrcamento/idiomaCurso.png"
+																	style="width:100%;height:200px;" />
+											
+										<p:outputLabel value="#{pacotesMB.paisLogo.nome}"
+											style="font-size:43px;font-weight: initial;margin-left:2%;color:#8B0000;" />
+									</div>
+									<br/><br/>
+								</h:panelGroup>
+							<hr  
+								style="color: #A0C637; width: 100%; margin-left: 0%; height: 10px; margin-top: 0px;" />
+							<br />
+							<ui:repeat value="#{pacotesMB.listaOCursos}"
+								var="pacote">    
+								<div class="col-md-3">     
+									<h:panelGroup>
+										<div class="borderSombra" style="height: 375px;border-radius:10px;background:#f5f3e5;">
+											<div style="height: 300px;">   
+												<h:panelGrid columns="1" style="width:95%;margin-left:4%;">
+													<br />
+													<h:panelGroup>
+														<h:panelGrid columns="3" style="width:87%;margin-left:10%;">
+															<h:panelGrid columns="1"
+																
+																style="width:99%;margin-left:0.5%;">
+																<img src="#{pacotesMB.retornarImagemEscola(pacote)}"
+																	width="30" />
+															</h:panelGrid>
+															<h:panelGrid columns="1" style="width:100%;">
+																<p:outputLabel value="#{pacote.fornecedorcidadeidioma.fornecedorcidade.cidade.nome}"
+																		style="font-size:14px;margin-left:2%;" />
+																<p:outputLabel value="#{pacote.fornecedorcidadeidioma.fornecedorcidade.fornecedor.nome}"
+																	style="font-size:14px;margin-left:2%;" />
+															</h:panelGrid>
+															<h:panelGrid columns="1" style="width:100%;">
+																<h:panelGroup rendered="#{pacotesMB.verificarCarimbo(pacote)}">
+																	<img src="http://systm.com.br:82/systm/atalhoOrcamento/#{pacote.nomecarimbo}"
+																		width="60" />
+																</h:panelGroup>
+															</h:panelGrid>
+														</h:panelGrid>
+													</h:panelGroup>  
+												</h:panelGrid>
+												<h:panelGrid columns="1" style="width:95%;margin-left:4%;"
+													columnClasses="tamanho98">
+													<h:panelGroup>
+														<p:outputLabel value="#{pacotesMB.formatarTotalMoedaNacional(pacote)}"
+															style="font-size:26px;color:#A0C637;margin-left:1%;">
+															<f:convertNumber pattern="##,###,###,###.##" minFractionDigits="2" />
+														</p:outputLabel> 
+													</h:panelGroup>
+													<h:panelGroup>
+														<p:outputLabel value="#{pacotesMB.formatarTotalMoedaEstrangeira(pacote)}"
+															style="font-size:26px;color:#A0C637;margin-left:1%;">
+															<f:convertNumber pattern="##,###,###,###.##" minFractionDigits="2" />
+														</p:outputLabel> 
+													</h:panelGroup>
+													<p:outputLabel value="#{pacote.numerosemanas} semana(s)"
+														style="font-size:13px;font-weight: initial;" />
+	
+													<p:outputLabel value="Curso: #{pacote.produtosorcamento.descricao}"
+														style="font-size:12px;font-weight: initial;margin-top:4%;" />
+													<p:outputLabel value="Turno: #{pacote.turno}"
+														style="font-size:12px;font-weight: initial;" />
+													<p:outputLabel
+														value="Duração: #{pacote.numerosemanas} semana(s)"
+														style="font-size:12px;font-weight: initial;" />
+													<p:outputLabel
+														value="Início: #{pacotesMB.retornarDataInicio(pacote)}"
+														style="font-size:12px;font-weight: initial;" />
+													<p:outputLabel value="#{pacotesMB.gerarAcomodacao(pacote)}"
+														style="font-size:12px;font-weight: initial;" />
+												</h:panelGrid>
+											</div>
+											<br />
+											<div align="center">
+												<p:commandButton value="Orçamento" icon="ui-icon-cart"  
+													title="Gerar orçamento com este modelo" disabled="#{pacotesMB.habilitarBotaoOrcamento()}"
+													action="#{pacotesMB.setarPacote(pacote)}"
+													style="margin-left:2%;font-size:12px;" >
+													<p:ajax event="dialogReturn" listener="#{pacotesMB.retornoDialogData}"/>
+												</p:commandButton>
+											</div>
+											<br />
+										</div>
+									</h:panelGroup>
+									<br /> <br /> <br /> <br />
+								</div>
+							</ui:repeat>
+						</h:panelGroup>
+					</p:scrollPanel>
+				</h:panelGroup>
+				<br />
+			</div>
+		</div>
+	</div>
+</h:form>
