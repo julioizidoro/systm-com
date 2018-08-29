@@ -3,6 +3,8 @@
   <persistence-unit name="systmPU" transaction-type="RESOURCE_LOCAL">
   	
   	<non-jta-data-source>java:comp/env/jdbc/systmDB</non-jta-data-source>
+  
+    <class>br.com.travelmate.model.Acesso</class>
     <class>br.com.travelmate.model.Banco</class>
     <class>br.com.travelmate.model.Cambio</class>
     <class>br.com.travelmate.model.Cidade</class>
@@ -290,7 +292,6 @@
     <class>br.com.travelmate.model.Arquivoshitorico</class>
     <class>br.com.travelmate.model.Heexportar</class>
     <class>br.com.travelmate.model.Arquvioslista</class>
-    <class>br.com.travelmate.model.Acesso</class>
     
     
     <exclude-unlisted-classes>true</exclude-unlisted-classes>

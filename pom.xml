@@ -52,18 +52,7 @@
             <artifactId>jasperreports</artifactId>
             <version>5.6.0</version>
         </dependency>
-      <dependency>
-   <groupId>org.jrimum</groupId>
-   <artifactId>jrimum-bopepo</artifactId>
-   <version>0.2.3-SNAPSHOT</version><!-- 0.2.3-DEV-SNAPSHOT em desenvolvimento -->
-         <type>jar</type>
-      </dependency>
-        <dependency>
-   <groupId>org.jrimum</groupId>
-   <artifactId>jrimum-domkee</artifactId>
-   <version>0.2.3-SNAPSHOT</version><!-- 0.2.3-DEV-SNAPSHOT em desenvolvimento -->
-         <type>jar</type>
-      </dependency>
+      
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
@@ -426,11 +415,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.primefaces.themes</groupId>
-            <artifactId>south-street</artifactId>
-            <version>1.0.8</version>
         </dependency>
         <dependency>
             <groupId>stax</groupId>
